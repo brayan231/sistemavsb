@@ -1492,7 +1492,7 @@ tbody tr:last-child td {
 
 /* BOTÓN HAMBURGUESA PARA MÓVIL */
 .menu-toggle {
-    display: none;
+    display: none; /* Oculto por defecto */
     background: none;
     border: none;
     font-size: 24px;
@@ -1501,6 +1501,10 @@ tbody tr:last-child td {
     padding: 8px;
     border-radius: var(--radius-md);
     transition: all var(--transition-base);
+    width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
 }
 
 .menu-toggle:hover {
@@ -1521,18 +1525,17 @@ tbody tr:last-child td {
     backdrop-filter: blur(4px);
 }
 
-/* SIDEBAR RESPONSIVE */
+/* SIDEBAR RESPONSIVE - SOLO PARA MÓVIL */
 @media (max-width: 1024px) {
     .menu-toggle {
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        display: flex !important; /* Solo visible en móvil */
     }
     
     .sidebar {
         transform: translateX(-100%);
         transition: transform 0.3s ease;
         z-index: 1000;
+        width: 280px;
     }
     
     .sidebar.active {
@@ -1542,8 +1545,40 @@ tbody tr:last-child td {
     .sidebar-overlay.active {
         display: block;
     }
+    
+    .main-content {
+        margin-left: 0;
+        width: 100%;
+    }
 }
 
+/* MEJORAS ESPECÍFICAS PARA MÓVIL MÁS PEQUEÑO */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 260px;
+    }
+    
+    .top-bar {
+        padding: 0 var(--spacing-md);
+    }
+    
+    .header-left {
+        gap: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .sidebar {
+        width: 100%;
+        max-width: 300px;
+    }
+    
+    .menu-toggle {
+        width: 36px;
+        height: 36px;
+        font-size: 20px;
+    }
+}
 
 /* ESTADO DE CARGA MEJORADO PARA MÓVIL */
 @media (max-width: 768px) {
