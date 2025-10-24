@@ -1439,6 +1439,128 @@ tbody tr:last-child td {
     }
 }
     
+
+/* MEJORAS ESPECÍFICAS PARA TABLAS EN MÓVIL */
+@media (max-width: 768px) {
+    .card-body {
+        padding: var(--spacing-md);
+    }
+    
+    /* Tablas con scroll horizontal mejorado */
+    .table-responsive {
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-md);
+    }
+    
+    /* Headers de tabla fijos en móvil */
+    .table-responsive table {
+        min-width: 600px;
+    }
+    
+    /* Botones de acción en tabla apilados */
+    .action-buttons {
+        flex-direction: column;
+        gap: 4px;
+    }
+    
+    .action-buttons .btn {
+        min-width: 80px;
+        justify-content: center;
+    }
+}
+
+/* MEJORAS PARA FORMULARIOS EN MÓVIL */
+@media (max-width: 480px) {
+    .form-control {
+        font-size: 16px; /* Previene zoom en iOS */
+    }
+    
+    .modal-footer {
+        flex-direction: column;
+    }
+    
+    .modal-footer .btn {
+        width: 100%;
+        margin-bottom: 8px;
+    }
+    
+    .modal-footer .btn:last-child {
+        margin-bottom: 0;
+    }
+}
+
+
+/* BOTÓN HAMBURGUESA PARA MÓVIL */
+.menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: var(--gray-700);
+    cursor: pointer;
+    padding: 8px;
+    border-radius: var(--radius-md);
+    transition: all var(--transition-base);
+}
+
+.menu-toggle:hover {
+    background: var(--gray-100);
+    color: var(--primary);
+}
+
+/* OVERLAY PARA MÓVIL */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    backdrop-filter: blur(4px);
+}
+
+/* SIDEBAR RESPONSIVE */
+@media (max-width: 1024px) {
+    .menu-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        z-index: 1000;
+    }
+    
+    .sidebar.active {
+        transform: translateX(0);
+    }
+    
+    .sidebar-overlay.active {
+        display: block;
+    }
+}
+
+
+/* ESTADO DE CARGA MEJORADO PARA MÓVIL */
+@media (max-width: 768px) {
+    .spinner {
+        width: 20px;
+        height: 20px;
+    }
+    
+    .empty-state {
+        padding: var(--spacing-lg);
+    }
+    
+    .empty-state i {
+        font-size: 36px;
+    }
+}
+
     /* Configuración de página */
     @page {
         margin: 10mm;
