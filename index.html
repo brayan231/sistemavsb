@@ -55,26 +55,26 @@
 
         <!-- Main Content -->
         <main class="main-content">
-            <header class="top-bar">
-                <div class="page-title">
-                    <h1>Dashboard</h1>
-                </div>
-                <div class="user-menu">
-                    <div class="user-info">
-                        <div class="user-avatar">AD</div>
-                        <span>Administrador</span>
-                    </div>
-                    <div class="action-buttons">
-                        <button class="btn btn-secondary btn-sm" onclick="exportData()">
-                            <i class="fas fa-download"></i> Exportar
-                        </button>
-                        <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importData(event)">
-                        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('import-file').click()">
-                            <i class="fas fa-upload"></i> Importar
-                        </button>
-                    </div>
-                </div>
-            </header>
+            <div class="top-bar">
+    <div class="header-left" style="display: flex; align-items: center; gap: 15px;">
+        <!-- Botón Hamburguesa -->
+        <button class="menu-toggle" id="menuToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        
+        <div class="page-title">
+            <h1>Dashboard</h1>
+        </div>
+    </div>
+    
+    <div class="user-info">
+        <div class="user-avatar">A</div>
+        <span>Administrador</span>
+    </div>
+</div>
+
+<!-- Overlay para móvil -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
 
             <div class="content-container">
                 <!-- Dashboard Section -->
