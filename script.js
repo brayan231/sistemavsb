@@ -1432,3 +1432,84 @@ function importData(event) {
     
     event.target.value = '';
 }
+// Menú hamburguesa para móvil
+function setupMobileMenu() {
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.querySelector('.sidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+    function toggleSidebar() {
+        sidebar.classList.toggle('active');
+        sidebarOverlay.classList.toggle('active');
+        document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
+    }
+
+    function closeSidebar() {
+        sidebar.classList.remove('active');
+        sidebarOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    // Event listeners
+    if (menuToggle) {
+        menuToggle.addEventListener('click', toggleSidebar);
+    }
+
+    if (sidebarOverlay) {
+        sidebarOverlay.addEventListener('click', closeSidebar);
+    }
+
+    // Cerrar sidebar al hacer clic en un enlace (en móvil)
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', () => {
+            if (window.innerWidth <= 1024) {
+                closeSidebar();
+            }
+        });
+    });
+
+    // Cerrar sidebar al redimensionar la ventana a un tamaño mayor
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 1024) {
+            closeSidebar();
+        }
+    });
+}
+
+// Llamar esta función en el DOMContentLoaded
+document.addEventListener('DOMContentLoaded', function() {
+    setupMobileMenu();
+ 
+});
+
+// Inicializar el menú móvil cuando se cargue el DOM
+document.addEventListener('DOMContentLoaded', function() {
+    setupMobileMenu();
+});
+
+// También actualiza la función initializeSystem para incluir el menú móvil
+function initializeSystem() {
+    if (!localStorage.getItem('salesSystemInitialized')) {
+        const initialData = {
+            products: [
+                { id: 1, name: "Laptop HP 15\"", category: "Electrónicos", price: 450.00, cost: 350.00, stock: 12, minStock: 5, description: "Laptop HP" },
+                { id: 2, name: "Mouse Inalámbrico", category: "Electrónicos", price: 25.50, cost: 15.00, stock: 3, minStock: 10, description: "Mouse ergonómico" },
+                { id: 3, name: "Teclado Mecánico", category: "Electrónicos", price: 75.00, cost: 45.00, stock: 5, minStock: 8, description: "Teclado gaming" }
+            ],
+            clients: [
+                { id: 1, dni: "12345678", name: "Juan Pérez", email: "juan@example.com", phone: "555-1234", address: "Calle Principal 123", type: "regular" },
+                { id: 2, dni: "87654321", name: "María García", email: "maria@example.com", phone: "555-5678", address: "Av. Central 456", type: "premium" }
+            ],
+            sales: []
+        };
+        
+        localStorage.setItem('products', JSON.stringify(initialData.products));
+        localStorage.setItem('clients', JSON.stringify(initialData.clients));
+        localStorage.setItem('sales', JSON.stringify(initialData.sales));
+        localStorage.setItem('salesSystemInitialized', 'true');
+    }
+    
+    // Inicializar menú móvil
+    setupMobileMenu();
+    showAlert('Sistema cargado correctamente', 'success');
+}
