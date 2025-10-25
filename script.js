@@ -1513,3 +1513,26 @@ function initializeSystem() {
     setupMobileMenu();
     showAlert('Sistema cargado correctamente', 'success');
 }
+
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyD6KY5qOjhE_2LZzew6CaLfYs9KTHHG7MI",
+  authDomain: "basededatos-b8f89.firebaseapp.com",
+  databaseURL: "https://basededatos-b8f89-default-rtdb.firebaseio.com",
+  projectId: "basededatos-b8f89",
+  storageBucket: "basededatos-b8f89.firebasestorage.app",
+  messagingSenderId: "1026805766467",
+  appId: "1:1026805766467:web:16c5b1c8e8c4d42b4e37f6",
+  measurementId: "G-ZXM0YYE5V1"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
