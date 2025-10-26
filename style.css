@@ -771,7 +771,214 @@ tbody tr:last-child td {
 }
 
 /* ============================================
-   ESTILOS PARA BOLETA ELECTRÓNICA COMPACTA - CORREGIDOS
+   ESTILOS PARA MÉTODOS DE PAGO MEJORADOS
+   ============================================ */
+
+.payment-section {
+    background: var(--gray-50);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    margin: var(--spacing-lg) 0;
+    border: 1px solid var(--border-light);
+}
+
+.payment-methods {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-md);
+    margin: var(--spacing-lg) 0;
+}
+
+.payment-method {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-lg);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    background: var(--white);
+    text-align: center;
+    min-height: 80px;
+}
+
+.payment-method:hover {
+    border-color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.payment-method.selected {
+    border-color: var(--success);
+    background-color: var(--success-light);
+    box-shadow: 0 4px 12px rgba(15, 157, 88, 0.2);
+}
+
+.payment-method i {
+    font-size: 24px;
+    margin-bottom: 8px;
+    color: var(--gray-600);
+    transition: color var(--transition-base);
+}
+
+.payment-method.selected i {
+    color: var(--success);
+}
+
+.payment-method span {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--gray-700);
+    transition: color var(--transition-base);
+}
+
+.payment-method.selected span {
+    color: var(--success);
+    font-weight: 600;
+}
+
+/* Sección de pagos parciales */
+.partial-payment {
+    background: var(--warning-light);
+    border: 1px solid var(--warning);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    margin-top: var(--spacing-md);
+}
+
+.product-selection {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    margin: var(--spacing-md) 0;
+    background: var(--white);
+}
+
+.product-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    margin: 5px 0;
+    background: var(--gray-50);
+    border-radius: var(--radius-md);
+    transition: background var(--transition-fast);
+    border: 1px solid var(--border-light);
+}
+
+.product-checkbox:hover {
+    background: var(--gray-100);
+}
+
+.product-checkbox input[type="checkbox"] {
+    margin: 0;
+    transform: scale(1.2);
+}
+
+.payment-input-group {
+    display: flex;
+    gap: var(--spacing-md);
+    align-items: center;
+}
+
+.payment-input-group .form-control {
+    flex: 1;
+}
+
+.payment-details {
+    margin-top: var(--spacing-md);
+    padding: var(--spacing-md);
+    background: var(--white);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+}
+
+/* Estados de venta en el historial */
+.sale-status {
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status-paid {
+    background: var(--success-light);
+    color: var(--success-dark);
+}
+
+.status-separado {
+    background: var(--warning-light);
+    color: var(--warning-dark);
+}
+
+.status-pendiente {
+    background: var(--danger-light);
+    color: var(--danger-dark);
+}
+
+/* Estilos para ventas pendientes */
+.pending-sales-alert {
+    background: var(--warning-light) !important;
+    border: 1px solid var(--warning) !important;
+    color: var(--warning-dark) !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+}
+
+.sale-details {
+    background: var(--gray-50);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--spacing-md);
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    padding: var(--spacing-md);
+    background: var(--white);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-light);
+}
+
+.detail-item label {
+    font-weight: bold;
+    color: var(--gray-700);
+}
+
+.pending-amount {
+    color: var(--danger);
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+/* Mejoras para los botones de acción en el historial */
+.action-buttons {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+.action-buttons .btn {
+    margin: 1px;
+    padding: 4px 8px;
+    font-size: 12px;
+}
+
+/* ============================================
+   ESTILOS PARA BOLETA ELECTRÓNICA COMPACTA
    ============================================ */
 
 .electronic-receipt {
@@ -806,7 +1013,6 @@ tbody tr:last-child td {
     align-items: flex-start;
 }
 
-/* LOGO CORREGIDO */
 .company-logo {
     width: 80px;
     height: 80px;
@@ -841,7 +1047,6 @@ tbody tr:last-child td {
     font-weight: bold;
 }
 
-/* Fallback para logo */
 .company-logo:has(.logo-img[src=""]) .logo-fallback,
 .company-logo:not(:has(.logo-img)) .logo-fallback,
 .company-logo .logo-img[style*="display: none"] + .logo-fallback {
@@ -1065,434 +1270,9 @@ tbody tr:last-child td {
     background: var(--gray-500);
 }
 
-/* ============================================
-   ESTILOS PARA IMPRESIÓN MEJORADOS
-   ============================================ */
-
-@media print {
-    /* Reset completo para impresión */
-    body * {
-        visibility: hidden;
-        margin: 0 !important;
-        padding: 0 !important;
-    }
-    
-    #sale-receipt-modal,
-    #sale-receipt-modal * {
-        visibility: visible;
-    }
-    
-  /* Estilos para el modal de boleta */
-#sale-receipt-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    display: none;
-    justify-content: center;
-    align-items: flex-start; /* Cambiado a flex-start para mejor scroll */
-    z-index: 1000;
-    padding: 20px 0;
-    overflow-y: auto; /* Permitir scroll vertical */
-}
-
-#sale-receipt-modal .modal-content {
-    background: white;
-    border-radius: 8px;
-    width: 95%;
-    max-width: 800px;
-    max-height: 90vh; /* Altura máxima */
-    overflow-y: auto; /* Scroll interno si es necesario */
-    position: relative;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-}
-
-#sale-receipt-modal .modal-header {
-    position: sticky;
-    top: 0;
-    background: white;
-    z-index: 10;
-    border-bottom: 1px solid #ddd;
-    padding: 15px 20px;
-}
-
-#sale-receipt-modal .modal-body {
-    padding: 0; /* Quitamos padding para que la boleta ocupe todo */
-    overflow: visible; /* Permitir que la boleta se expanda */
-}
-
-#sale-receipt-modal .modal-footer {
-    position: sticky;
-    bottom: 0;
-    background: white;
-    z-index: 10;
-    border-top: 1px solid #ddd;
-    padding: 15px 20px;
-}
-
-/* Estilos específicos para la boleta electrónica */
-.electronic-receipt {
-    width: 100%;
-    background: white;
-    color: #333;
-    font-family: 'Arial', sans-serif;
-    line-height: 1.4;
-    padding: 20px;
-    box-sizing: border-box;
-}
-
-/* Header de la boleta */
-.receipt-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 2px solid #34495e;
-}
-
-.company-brand {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    flex: 1;
-}
-
-.company-logo img {
-    max-width: 80px;
-    height: auto;
-    display: block;
-}
-
-.company-info h1 {
-    margin: 0 0 5px 0;
-    font-size: 24px;
-    color: #2c3e50;
-    font-weight: bold;
-}
-
-.company-slogan {
-    margin: 0 0 8px 0;
-    font-style: italic;
-    color: #7f8c8d;
-    font-size: 14px;
-}
-
-.company-details {
-    font-size: 12px;
-    color: #666;
-}
-
-.company-details span {
-    display: block;
-    margin-bottom: 2px;
-}
-
-.receipt-badge {
-    background: #2c3e50;
-    color: white;
-    padding: 15px;
-    border-radius: 8px;
-    text-align: center;
-    min-width: 160px;
-}
-
-.badge-content span {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 5px;
-    font-size: 14px;
-}
-
-.receipt-number {
-    font-size: 18px;
-    font-weight: bold;
-}
-
-/* Meta información */
-.receipt-meta {
-    background: #f8f9fa;
-    padding: 15px;
-    border-radius: 5px;
-    margin-bottom: 20px;
-}
-
-.meta-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 10px;
-}
-
-.meta-item {
-    display: flex;
-    justify-content: space-between;
-}
-
-.meta-item label {
-    font-weight: bold;
-    color: #555;
-}
-
-/* Sección de cliente */
-.client-section {
-    margin-bottom: 20px;
-}
-
-.section-header-compact {
-    background: #34495e;
-    color: white;
-    padding: 8px 12px;
-    font-weight: bold;
-    border-radius: 4px;
-    margin-bottom: 10px;
-}
-
-.client-details-compact {
-    background: #f8f9fa;
-    padding: 15px;
-    border-radius: 5px;
-    border: 1px solid #e9ecef;
-}
-
-.client-row {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 8px;
-}
-
-.client-row:last-child {
-    margin-bottom: 0;
-}
-
-/* Tabla de productos */
-.products-section {
-    margin-bottom: 20px;
-}
-
-.products-table-container {
-    overflow-x: auto;
-}
-
-.products-table-compact {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 14px;
-    background: white;
-}
-
-.products-table-compact th {
-    background: #34495e;
-    color: white;
-    padding: 12px 8px;
-    text-align: left;
-    font-weight: bold;
-    border: 1px solid #2c3e50;
-}
-
-.products-table-compact td {
-    padding: 10px 8px;
-    border: 1px solid #ddd;
-}
-
-.product-col {
-    width: 50%;
-}
-
-.qty-col, .price-col, .total-col {
-    width: 16%;
-    text-align: center;
-}
-
-.product-name {
-    font-weight: 500;
-}
-
-.quantity, .unit-price, .product-total {
-    text-align: center;
-}
-
-/* Totales */
-.totals-section-compact {
-    margin-bottom: 20px;
-}
-
-.totals-grid-compact {
-    border: 2px solid #34495e;
-    border-radius: 8px;
-    padding: 20px;
-    background: #f8f9fa;
-}
-
-.total-row {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 12px;
-    font-size: 16px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid #dee2e6;
-}
-
-.total-row:last-child {
-    border-bottom: none;
-    margin-bottom: 0;
-}
-
-.grand-total {
-    font-size: 18px;
-    font-weight: bold;
-    border-top: 2px solid #34495e;
-    padding-top: 12px;
-    margin-top: 8px;
-    color: #2c3e50;
-}
-
-.total-label {
-    font-weight: bold;
-}
-
-.total-value {
-    font-weight: bold;
-}
-
-/* Footer de la boleta */
-.receipt-footer-compact {
-    background: #f8f9fa;
-    padding: 20px;
-    border-radius: 5px;
-    border: 1px solid #e9ecef;
-    text-align: center;
-}
-
-.footer-info {
-    display: flex;
-    justify-content: space-around;
-    margin-bottom: 15px;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.footer-info p {
-    margin: 0;
-    font-size: 14px;
-}
-
-.legal-compact {
-    font-size: 12px;
-    color: #666;
-}
-
-.legal-compact p {
-    margin: 5px 0;
-}
-
-/* Botones del modal */
-.btn-whatsapp {
-    background: #25D366;
-    color: white;
-    border: none;
-}
-
-.btn-whatsapp:hover {
-    background: #128C7E;
-    color: white;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    #sale-receipt-modal .modal-content {
-        width: 98%;
-        margin: 10px;
-    }
-    
-    .receipt-header {
-        flex-direction: column;
-        gap: 15px;
-    }
-    
-    .receipt-badge {
-        min-width: 100%;
-    }
-    
-    .meta-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .client-row {
-        flex-direction: column;
-        gap: 5px;
-    }
-    
-    .footer-info {
-        flex-direction: column;
-        gap: 10px;
-    }
-    
-    .products-table-compact {
-        font-size: 12px;
-    }
-    
-    .products-table-compact th,
-    .products-table-compact td {
-        padding: 8px 4px;
-    }
-}
-    
-
-/* MEJORAS ESPECÍFICAS PARA TABLAS EN MÓVIL */
-@media (max-width: 768px) {
-    .card-body {
-        padding: var(--spacing-md);
-    }
-    
-    /* Tablas con scroll horizontal mejorado */
-    .table-responsive {
-        border: 1px solid var(--border-light);
-        border-radius: var(--radius-md);
-    }
-    
-    /* Headers de tabla fijos en móvil */
-    .table-responsive table {
-        min-width: 600px;
-    }
-    
-    /* Botones de acción en tabla apilados */
-    .action-buttons {
-        flex-direction: column;
-        gap: 4px;
-    }
-    
-    .action-buttons .btn {
-        min-width: 80px;
-        justify-content: center;
-    }
-}
-
-/* MEJORAS PARA FORMULARIOS EN MÓVIL */
-@media (max-width: 480px) {
-    .form-control {
-        font-size: 16px; /* Previene zoom en iOS */
-    }
-    
-    .modal-footer {
-        flex-direction: column;
-    }
-    
-    .modal-footer .btn {
-        width: 100%;
-        margin-bottom: 8px;
-    }
-    
-    .modal-footer .btn:last-child {
-        margin-bottom: 0;
-    }
-}
-
-
 /* BOTÓN HAMBURGUESA PARA MÓVIL */
 .menu-toggle {
-    display: none; /* Oculto por defecto */
+    display: none;
     background: none;
     border: none;
     font-size: 24px;
@@ -1525,10 +1305,13 @@ tbody tr:last-child td {
     backdrop-filter: blur(4px);
 }
 
-/* SIDEBAR RESPONSIVE - SOLO PARA MÓVIL */
+/* ============================================
+   RESPONSIVE DESIGN MEJORADO
+   ============================================ */
+
 @media (max-width: 1024px) {
     .menu-toggle {
-        display: flex !important; /* Solo visible en móvil */
+        display: flex !important;
     }
     
     .sidebar {
@@ -1544,82 +1327,6 @@ tbody tr:last-child td {
     
     .sidebar-overlay.active {
         display: block;
-    }
-    
-    .main-content {
-        margin-left: 0;
-        width: 100%;
-    }
-}
-
-/* MEJORAS ESPECÍFICAS PARA MÓVIL MÁS PEQUEÑO */
-@media (max-width: 768px) {
-    .sidebar {
-        width: 260px;
-    }
-    
-    .top-bar {
-        padding: 0 var(--spacing-md);
-    }
-    
-    .header-left {
-        gap: 10px;
-    }
-}
-
-@media (max-width: 480px) {
-    .sidebar {
-        width: 100%;
-        max-width: 300px;
-    }
-    
-    .menu-toggle {
-        width: 36px;
-        height: 36px;
-        font-size: 20px;
-    }
-}
-
-/* ESTADO DE CARGA MEJORADO PARA MÓVIL */
-@media (max-width: 768px) {
-    .spinner {
-        width: 20px;
-        height: 20px;
-    }
-    
-    .empty-state {
-        padding: var(--spacing-lg);
-    }
-    
-    .empty-state i {
-        font-size: 36px;
-    }
-}
-
-    /* Configuración de página */
-    @page {
-        margin: 10mm;
-        size: A4;
-    }
-    
-    body {
-        margin: 0;
-        padding: 0;
-    }
-}
-
-/* ============================================
-   RESPONSIVE DESIGN MEJORADO
-   ============================================ */
-
-@media (max-width: 1024px) {
-    .sidebar {
-        transform: translateX(-100%);
-        transition: transform 0.3s ease;
-    }
-    
-    .sidebar.active {
-        transform: translateX(0);
     }
     
     .main-content {
@@ -1667,6 +1374,20 @@ tbody tr:last-child td {
         margin: 10px auto;
     }
     
+    /* Métodos de pago responsive */
+    .payment-methods {
+        grid-template-columns: 1fr;
+    }
+    
+    .payment-method {
+        min-height: 70px;
+        padding: 12px;
+    }
+    
+    .payment-method i {
+        font-size: 20px;
+    }
+    
     /* Boleta responsive */
     .receipt-header {
         flex-direction: column;
@@ -1704,6 +1425,27 @@ tbody tr:last-child td {
     .products-table-compact td {
         padding: 6px 8px;
     }
+    
+    /* Tablas con scroll horizontal mejorado */
+    .table-responsive {
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-md);
+    }
+    
+    .table-responsive table {
+        min-width: 600px;
+    }
+    
+    /* Botones de acción en tabla apilados */
+    .action-buttons {
+        flex-direction: column;
+        gap: 4px;
+    }
+    
+    .action-buttons .btn {
+        min-width: 80px;
+        justify-content: center;
+    }
 }
 
 @media (max-width: 480px) {
@@ -1731,5 +1473,180 @@ tbody tr:last-child td {
     .btn {
         padding: 8px 16px;
         font-size: 13px;
+    }
+    
+    .sidebar {
+        width: 100%;
+        max-width: 300px;
+    }
+    
+    .menu-toggle {
+        width: 36px;
+        height: 36px;
+        font-size: 20px;
+    }
+    
+    .form-control {
+        font-size: 16px; /* Previene zoom en iOS */
+    }
+    
+    .modal-footer {
+        flex-direction: column;
+    }
+    
+    .modal-footer .btn {
+        width: 100%;
+        margin-bottom: 8px;
+    }
+    
+    .modal-footer .btn:last-child {
+        margin-bottom: 0;
+    }
+    
+    .spinner {
+        width: 20px;
+        height: 20px;
+    }
+    
+    .empty-state {
+        padding: var(--spacing-lg);
+    }
+    
+    .empty-state i {
+        font-size: 36px;
+    }
+}
+
+/* ============================================
+   ESTILOS PARA IMPRESIÓN MEJORADOS
+   ============================================ */
+
+@media print {
+    body * {
+        visibility: hidden;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    #sale-receipt-modal,
+    #sale-receipt-modal * {
+        visibility: visible;
+    }
+    
+    @page {
+        margin: 10mm;
+        size: A4;
+    }
+    
+    body {
+        margin: 0;
+        padding: 0;
+    }
+}
+
+/* === MENÚ RESPONSIVE === */
+.mobile-menu-btn {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #333;
+    cursor: pointer;
+    padding: 10px;
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 1002;
+    background: white;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 999;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .mobile-menu-btn {
+        display: block;
+    }
+    
+    .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        z-index: 1000;
+        position: fixed;
+        height: 100vh;
+        overflow-y: auto;
+    }
+    
+    .sidebar.active {
+        transform: translateX(0);
+    }
+    
+    .sidebar-overlay.active {
+        display: block;
+    }
+    
+    .main-content {
+        margin-left: 0;
+        padding: 70px 15px 15px 15px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .table-responsive {
+        overflow-x: auto;
+    }
+}
+
+@media (max-width: 768px) {
+    .modal-dialog {
+        margin: 20px;
+        width: auto;
+    }
+    
+    .action-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .action-buttons .btn {
+        margin: 2px 0;
+    }
+    
+    .electronic-receipt {
+        padding: 15px;
+    }
+    
+    .company-brand {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-title h1 {
+        font-size: 1.5rem;
+    }
+    
+    .btn {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+    }
+    
+    .modal-header h3 {
+        font-size: 1.2rem;
     }
 }
