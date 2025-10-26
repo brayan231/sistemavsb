@@ -14,9 +14,9 @@ const API_CONFIG = {
     token: '3a451e42f184f40438d77992c710b41f39de11872984aebf33058276a75a46c6'
 };
 
-// CONFIGURACIÓN FIREBASE
+// CONFIGURACIÓN FIREBASE - CLAVE NUEVA
 const firebaseConfig = {
-    apiKey: "AIzaSyD6KY5qOjhE_2LZzew6CaLfYs9KTHHG7MI",
+    apiKey: "AIzaSyCNPAq_JrdikWJBLWR5QYzo-U0PhV4vvxA",
     authDomain: "basededatos-b8f89.firebaseapp.com",
     databaseURL: "https://basededatos-b8f89-default-rtdb.firebaseio.com",
     projectId: "basededatos-b8f89",
@@ -28,6 +28,7 @@ const firebaseConfig = {
 // Inicializar Firebase
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
+
 
 // === FUNCIONES FIREBASE ===
 function getProducts() {
@@ -239,7 +240,6 @@ function calculateChange() {
         document.getElementById('normal-change').textContent = '0.00';
     }
 }
-
 
 // === ACTUALIZACIÓN EN TIEMPO REAL ===
 function setupRealtimeUpdates() {
@@ -1878,162 +1878,6 @@ async function clearAllSalesHistory() {
                 updateDashboardStats();
             }, 500);
         }
-    }
-}
-
-// === FUNCIÓN COMPLETA DE VENTA CON ADELANTOS/SEPARACIONES ===
-async function completeSale() {
-    try {
-        console.log('🔹 Iniciando proceso de venta...');
-        
-        const sales = await getSales();
-        const products = await getProducts();
-        const clientId = parseInt(document.getElementById('sale-client').value);
-        
-        console.log('🔹 Datos obtenidos:', { clientId, currentSaleItems });
-
-        // Validaciones básicas
-        if (!clientId) {
-            showAlert('Seleccione un cliente', 'error');
-            return;
-        }
-        
-        if (currentSaleItems.length === 0) {
-            showAlert('Agregue productos a la venta', 'error');
-            return;
-        }
-
-        // Calcular montos base
-        const subtotal = currentSaleItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        const igv = 0;
-        const totalAmount = subtotal;
-        
-        console.log('🔹 Montos calculados:', { subtotal, totalAmount });
-
-        let paidAmount = 0;
-        let pendingAmount = 0;
-        let saleStatus = 'Pagado';
-        let saleType = 'Venta';
-        
-        // Validar según el tipo de pago
-        if (isPartialPayment) {
-            console.log('🔹 Procesando PAGO PARCIAL');
-            
-            const selectedTotal = parseFloat(document.getElementById('selected-total').textContent) || 0;
-            const paymentAmountInput = document.getElementById('payment-amount').value;
-            const paymentAmount = parseFloat(paymentAmountInput) || 0;
-            
-            console.log('🔹 Validando separación:', { selectedTotal, paymentAmountInput, paymentAmount });
-
-            if (selectedProducts.length === 0) {
-                showAlert('Seleccione al menos un producto para la separación', 'error');
-                return;
-            }
-            
-            if (paymentAmount <= 0) {
-                showAlert('Ingrese un monto válido para el adelanto', 'error');
-                document.getElementById('payment-amount').focus();
-                return;
-            }
-            
-            if (paymentAmount > selectedTotal) {
-                showAlert(`El monto de adelanto (S/ ${paymentAmount.toFixed(2)}) no puede ser mayor al total seleccionado (S/ ${selectedTotal.toFixed(2)})`, 'error');
-                document.getElementById('payment-amount').focus();
-                return;
-            }
-            
-            // Para separación: usar el monto ingresado como adelanto
-            paidAmount = paymentAmount;
-            pendingAmount = Math.max(0, selectedTotal - paidAmount);
-            saleStatus = pendingAmount > 0 ? 'Separado' : 'Pagado';
-            saleType = pendingAmount > 0 ? 'Separación' : 'Venta';
-            
-        } else {
-            // PAGO COMPLETO
-            console.log('🔹 Procesando PAGO COMPLETO');
-            
-            // Para pago completo: el monto pagado es igual al total, no necesita validar "monto recibido"
-            paidAmount = totalAmount;
-            pendingAmount = 0;
-            saleStatus = 'Pagado';
-            saleType = 'Venta';
-            
-            console.log('🔹 Pago completo procesado:', { totalAmount, paidAmount });
-        }
-        
-        const newId = sales.length > 0 ? Math.max(...sales.map(s => s.id)) + 1 : 1;
-        
-        const newSale = {
-            id: newId,
-            clientId,
-            date: new Date().toLocaleDateString('es-PE'),
-            subtotal,
-            igv,
-            total: totalAmount,
-            paidAmount,
-            pendingAmount,
-            status: saleStatus,
-            type: saleType,
-            paymentMethod: selectedPaymentMethod,
-            isPartialPayment: isPartialPayment,
-            selectedProducts: isPartialPayment ? selectedProducts : [],
-            items: currentSaleItems.map(item => ({
-                productId: item.productId,
-                name: item.name,
-                quantity: item.quantity,
-                price: item.price,
-                total: item.price * item.quantity
-            }))
-        };
-        
-        console.log('🔹 Nueva venta creada:', newSale);
-        
-        // Actualizar stock solo si la venta está completamente pagada
-        const updatedProducts = products.map(product => {
-            const saleItem = currentSaleItems.find(item => item.productId === product.id);
-            if (saleItem && saleStatus === 'Pagado') {
-                const newStock = product.stock - saleItem.quantity;
-                console.log(`🔹 Actualizando stock producto ${product.name}: ${product.stock} -> ${newStock}`);
-                return { 
-                    ...product, 
-                    stock: Math.max(0, newStock) // Asegurar que no sea negativo
-                };
-            }
-            return product;
-        });
-        
-        await saveSales([...sales, newSale]);
-        await saveProducts(updatedProducts);
-        
-        currentSaleId = newId;
-        showSaleReceipt(newId);
-        
-        // Limpiar formulario
-        currentSaleItems = [];
-        selectedProducts = [];
-        isPartialPayment = false;
-        document.getElementById('sale-client').value = '';
-        document.getElementById('partial-payment-checkbox').checked = false;
-        document.getElementById('payment-amount').value = '';
-        document.getElementById('amount-received').value = ''; // Limpiar pero no es obligatorio
-        document.querySelectorAll('.payment-method').forEach(el => {
-            el.classList.remove('selected');
-        });
-        
-        updateSaleItemsTable();
-        togglePartialPayment();
-        
-        showAlert(`${saleType} ${saleStatus.toLowerCase()} completada correctamente`, 'success');
-
-        // Actualizar dashboard después de la venta
-        setTimeout(() => {
-            updateDashboardStats();
-            loadProductsTable();
-        }, 1000);
-        
-    } catch (error) {
-        console.error('❌ Error en completeSale:', error);
-        showAlert('Error al procesar la venta: ' + error.message, 'error');
     }
 }
 
