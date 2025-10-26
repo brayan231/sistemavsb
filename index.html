@@ -58,25 +58,25 @@
         <!-- Main Content -->
         <main class="main-content">
             <div class="top-bar">
-    <div class="header-left" style="display: flex; align-items: center; gap: 15px;">
-        <!-- Botón Hamburguesa -->
-        <button class="menu-toggle" id="menuToggle">
-            <i class="fas fa-bars"></i>
-        </button>
-        
-        <div class="page-title">
-            <h1>Dashboard</h1>
-        </div>
-    </div>
-    
-    <div class="user-info">
-        <div class="user-avatar">A</div>
-        <span>Administrador</span>
-    </div>
-</div>
+                <div class="header-left" style="display: flex; align-items: center; gap: 15px;">
+                    <!-- Botón Hamburguesa -->
+                    <button class="menu-toggle" id="menuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    
+                    <div class="page-title">
+                        <h1>Dashboard</h1>
+                    </div>
+                </div>
+                
+                <div class="user-info">
+                    <div class="user-avatar">A</div>
+                    <span>Administrador</span>
+                </div>
+            </div>
 
-<!-- Overlay para móvil -->
-<div class="sidebar-overlay" id="sidebarOverlay"></div>
+            <!-- Overlay para móvil -->
+            <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
             <div class="content-container">
                 <!-- Dashboard Section -->
@@ -117,6 +117,18 @@
                             <div class="stat-info">
                                 <h3 id="monthly-revenue">S/ 0.00</h3>
                                 <p>Ingresos Mensuales</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ventas Pendientes -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-clock"></i> Ventas Pendientes de Pago</h3>
+                        </div>
+                        <div class="card-body">
+                            <div id="pending-sales-list">
+                                <!-- Las ventas pendientes se cargarán aquí dinámicamente -->
                             </div>
                         </div>
                     </div>
@@ -224,7 +236,7 @@
                     </div>
                 </div>
 
-                <!-- Sales Section -->
+                <!-- Sales Section - CORREGIDA -->
                 <div id="sales-section" class="section hidden">
                     <div class="card">
                         <div class="card-header">
@@ -272,6 +284,91 @@
                                 </table>
                             </div>
 
+                            <!-- Sección de Métodos de Pago MEJORADA -->
+                            <div class="payment-section">
+                                <h4><i class="fas fa-money-bill-wave"></i> Método de Pago</h4>
+                                
+                                <div class="payment-methods">
+                                    <div class="payment-method" data-method="efectivo">
+                                        <i class="fas fa-money-bill-wave"></i>
+                                        <span>Efectivo</span>
+                                    </div>
+                                    <div class="payment-method" data-method="tarjeta">
+                                        <i class="fas fa-credit-card"></i>
+                                        <span>Tarjeta</span>
+                                    </div>
+                                    <div class="payment-method" data-method="transferencia">
+                                        <i class="fas fa-university"></i>
+                                        <span>Transferencia</span>
+                                    </div>
+                                    <div class="payment-method" data-method="yape">
+                                        <i class="fas fa-mobile-alt"></i>
+                                        <span>Yape/Plin</span>
+                                    </div>
+                                </div>
+
+                                <!-- Selección de productos para pago parcial -->
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <input type="checkbox" id="partial-payment-checkbox" onchange="togglePartialPayment()">
+                                        Pago parcial (seleccionar productos específicos)
+                                    </label>
+                                </div>
+
+                                <!-- Sección de Pagos Parciales -->
+                                <div id="partial-payment-section" class="partial-payment hidden">
+                                    <h5><i class="fas fa-shopping-cart"></i> Seleccionar Productos a Pagar</h5>
+                                    
+                                    <div class="product-selection" id="product-selection-list">
+                                        <!-- Los productos se agregarán aquí dinámicamente -->
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">Monto a Pagar</label>
+                                        <div class="payment-input-group">
+                                            <input type="number" id="payment-amount" class="form-control" placeholder="0.00" step="0.01" min="0">
+                                            <button type="button" class="btn btn-info" onclick="calculateRemaining()">
+                                                <i class="fas fa-calculator"></i> Calcular
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="payment-details">
+                                        <div class="total-row">
+                                            <span>Total a Pagar:</span>
+                                            <span>S/ <span id="selected-total">0.00</span></span>
+                                        </div>
+                                        <div class="total-row">
+                                            <span>Monto Ingresado:</span>
+                                            <span>S/ <span id="entered-amount">0.00</span></span>
+                                        </div>
+                                        <div class="total-row">
+                                            <span>Cambio:</span>
+                                            <span>S/ <span id="change-amount">0.00</span></span>
+                                        </div>
+                                        <div class="total-row">
+                                            <span>Saldo Pendiente:</span>
+                                            <span>S/ <span id="pending-amount">0.00</span></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Pago normal (sin selección de productos) -->
+                                <div id="normal-payment-section">
+                                    <div class="form-group">
+                                        <label class="form-label">Monto Recibido</label>
+                                        <input type="number" id="amount-received" class="form-control" placeholder="0.00" step="0.01" min="0" oninput="calculateChange()">
+                                    </div>
+
+                                    <div class="payment-details">
+                                        <div class="total-row">
+                                            <span>Cambio:</span>
+                                            <span>S/ <span id="normal-change">0.00</span></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- Totales -->
                             <div class="totals-section mt-4">
                                 <div class="total-row">
@@ -279,7 +376,7 @@
                                     <span>S/ <span id="sale-subtotal">0.00</span></span>
                                 </div>
                                 <div class="total-row">
-                                    <span>IGV (18%):</span>
+                                    <span>IGV (0%):</span>
                                     <span>S/ <span id="sale-igv">0.00</span></span>
                                 </div>
                                 <div class="total-row grand-total">
@@ -289,7 +386,7 @@
                             </div>
 
                             <div class="text-right mt-4">
-                                <button class="btn btn-success" id="complete-sale-btn">
+                                <button class="btn btn-success" id="complete-sale-btn" onclick="completeSale()">
                                     <i class="fas fa-check-circle"></i> Completar Venta
                                 </button>
                             </div>
@@ -514,8 +611,6 @@
     <!-- Librerías para generar PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    
-    <!-- Agrega esto antes de tu script.js -->
     
     <script src="script.js"></script>
 </body>
