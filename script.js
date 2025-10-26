@@ -2165,3 +2165,4 @@ function showSection(section) {
         populateSaleSelects();
     }
 }
+
