@@ -2454,7 +2454,7 @@ async function showSaleReceipt(saleId) {
             <div class="receipt-header">
                 <div class="company-brand">
                     <div class="company-logo">
-                        <i class="fas fa-cash-register"></i>
+                        <img src="logo.png" alt="Logo" style="width: 60px; height: 60px; object-fit: contain; border-radius: 8px;">
                     </div>
                     <div class="company-info">
                         <h1>SkinBri Shop</h1>
