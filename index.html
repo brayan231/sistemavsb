@@ -36,6 +36,12 @@
                     </a>
                 </div>
                 <div class="nav-item">
+                    <a href="#" class="nav-link" data-section="categories">
+                        <i class="fas fa-tags"></i>
+                        <span>Categorías</span>
+                    </a>
+                </div>
+                <div class="nav-item">
                     <a href="#" class="nav-link" data-section="sales">
                         <i class="fas fa-shopping-cart"></i>
                         <span>Ventas</span>
@@ -207,14 +213,16 @@
 
                 <!-- Products Section -->
                 <div id="products-section" class="section hidden">
+                    <div class="section-header">
+                        <h2><i class="fas fa-boxes"></i> Gestión de Productos</h2>
+                        <button class="btn btn-primary" id="add-product-btn">
+                            <i class="fas fa-plus"></i> Agregar Producto
+                        </button>
+                    </div>
+                    
                     <div class="card">
                         <div class="card-header">
-                            <h3><i class="fas fa-list"></i> Lista de Productos</h3>
-                            <div class="action-buttons">
-                                <button class="btn btn-primary" id="add-product-btn">
-                                    <i class="fas fa-plus"></i> Agregar
-                                </button>
-                            </div>
+                            <h3><i class="fas fa-boxes"></i> Lista de Productos</h3>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
@@ -230,15 +238,65 @@
                                             <th>Acciones</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="products-table-body"></tbody>
+                                    <tbody id="products-table-body">
+                                        <tr>
+                                            <td colspan="7" class="empty-state">
+                                                <i class="fas fa-box-open"></i>
+                                                <p>Cargando productos...</p>
+                                            </td>
+                                        </tr>
+                                    </tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Sales Section - CORREGIDA -->
+                <!-- Categories Section (NUEVA SECCIÓN) -->
+                <div id="categories-section" class="section hidden">
+                    <div class="section-header">
+                        <h2><i class="fas fa-tags"></i> Gestión de Categorías</h2>
+                        <button class="btn btn-primary" id="add-category-btn" onclick="showCategoryForm()">
+                            <i class="fas fa-plus"></i> Agregar Categoría
+                        </button>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-tags"></i> Lista de Categorías</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 10%;">ID</th>
+                                            <th style="width: 25%;">Nombre</th>
+                                            <th style="width: 35%;">Descripción</th>
+                                            <th style="width: 15%;">Productos</th>
+                                            <th style="width: 15%;">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="categories-table-body">
+                                        <tr>
+                                            <td colspan="5" class="empty-state">
+                                                <i class="fas fa-tags"></i>
+                                                <p>Cargando categorías...</p>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sales Section con Interfaz Visual Mejorada -->
                 <div id="sales-section" class="section hidden">
+                    <div class="section-header">
+                        <h2><i class="fas fa-shopping-cart"></i> Gestión de Ventas</h2>
+                    </div>
+                    
                     <div class="card">
                         <div class="card-header">
                             <h3><i class="fas fa-cash-register"></i> Nueva Venta</h3>
@@ -254,55 +312,158 @@
                                         <option value="">Seleccione un cliente</option>
                                     </select>
                                 </div>
-                                <div class="form-group">
-                                    <label class="form-label">Producto</label>
-                                    <select id="sale-product" class="form-control" required>
-                                        <option value="">Seleccione un producto</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Cantidad</label>
-                                    <input type="number" id="sale-quantity" class="form-control" min="1" value="1">
-                                </div>
-                                <button type="button" class="btn btn-primary" id="add-to-sale-btn">
-                                    <i class="fas fa-cart-plus"></i> Agregar
-                                </button>
                             </form>
 
-                            <h4 class="mt-4">Productos en la Venta</h4>
-                            <div class="table-responsive">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Producto</th>
-                                            <th>Precio</th>
-                                            <th>Cantidad</th>
-                                            <th>Subtotal</th>
-                                            <th>Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="sale-items-body"></tbody>
-                                </table>
+                            <!-- Selector Visual de Productos -->
+                            <div class="product-selector-section">
+                                <h4><i class="fas fa-boxes"></i> Seleccionar Productos</h4>
+                                <div class="product-search">
+                                    <input type="text" id="product-search-input" class="form-control" 
+                                           placeholder="🔍 Buscar productos..." oninput="filterProducts()">
+                                </div>
+                                <div class="products-grid" id="products-grid">
+                                    <div class="empty-state">
+                                        <i class="fas fa-box-open"></i>
+                                        <p>Cargando productos...</p>
+                                    </div>
+                                </div>
                             </div>
 
-                            <!-- Sección de Métodos de Pago MEJORADA -->
+                            <!-- Controles de Cantidad -->
+                            <div class="quantity-controls hidden" id="quantity-controls">
+                                <div class="selected-product-info" id="selected-product-info">
+                                    <div class="product-image-small">
+                                        <i class="fas fa-box"></i>
+                                    </div>
+                                    <div class="product-details">
+                                        <h5 id="selected-product-name"></h5>
+                                        <p class="product-price" id="selected-product-price"></p>
+                                        <p class="stock-info" id="selected-product-stock"></p>
+                                    </div>
+                                </div>
+                                <div class="quantity-input-group">
+                                    <label class="form-label">Cantidad:</label>
+                                    <div class="quantity-stepper">
+                                        <button type="button" class="quantity-btn" onclick="adjustQuantity(-1)">
+                                            <i class="fas fa-minus"></i>
+                                        </button>
+                                        <input type="number" id="visual-sale-quantity" class="form-control" min="1" value="1">
+                                        <button type="button" class="quantity-btn" onclick="adjustQuantity(1)">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                    <button type="button" class="btn btn-primary" id="add-selected-product">
+                                        <i class="fas fa-cart-plus"></i> Agregar
+                                    </button>
+                                    <!-- Botón Agregar tradicional (oculto pero funcional) -->
+                                    <button type="button" class="btn btn-primary hidden" id="add-to-sale-btn" onclick="quickAddProduct()">
+                                        <i class="fas fa-cart-plus"></i> Agregar
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Sección de Descuentos MEJORADA -->
+                            <div class="discount-section">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <input type="checkbox" id="apply-discount-checkbox" onchange="toggleDiscountSection()">
+                                        Aplicar descuento especial
+                                    </label>
+                                </div>
+
+                                <div id="discount-controls" class="hidden">
+                                    <div class="discount-inputs">
+                                        <div class="form-group">
+                                            <label class="form-label">Motivo del descuento</label>
+                                            <select id="discount-reason" class="form-control discount-reason-select" onchange="handleDiscountReasonChange()">
+                                                <!-- Los motivos se cargarán dinámicamente -->
+                                            </select>
+                                        </div>
+                                        
+                                        <div id="custom-reason-container" class="custom-reason-container hidden">
+                                            <div class="form-group">
+                                                <label class="form-label">Motivo personalizado</label>
+                                                <input type="text" id="custom-discount-reason" class="form-control" 
+                                                    placeholder="Escriba el motivo del descuento...">
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-row">
+                                            <div class="form-group">
+                                                <label class="form-label">Tipo de descuento</label>
+                                                <select id="discount-type" class="form-control" onchange="updateDiscountCalculation()">
+                                                    <option value="percentage">Porcentaje (%)</option>
+                                                    <option value="fixed">Monto Fijo (S/)</option>
+                                                </select>
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label class="form-label" id="discount-amount-label">Descuento (%)</label>
+                                                <input type="number" id="discount-amount" class="form-control" 
+                                                    min="0" max="100" value="0" step="0.01" 
+                                                    oninput="updateDiscountCalculation()">
+                                            </div>
+                                        </div>
+
+                                        <div id="discount-preview" class="discount-preview hidden">
+                                            <div class="discount-preview-item">
+                                                <span>Subtotal:</span>
+                                                <span>S/ <span id="preview-subtotal">0.00</span></span>
+                                            </div>
+                                            <div class="discount-preview-item">
+                                                <span>Descuento:</span>
+                                                <span>- S/ <span id="preview-discount">0.00</span></span>
+                                            </div>
+                                            <div class="discount-preview-item total">
+                                                <span>Total con descuento:</span>
+                                                <span>S/ <span id="preview-total">0.00</span></span>
+                                            </div>
+                                        </div>
+
+                                        <div class="discount-actions">
+                                            <button type="button" class="btn btn-success btn-sm" onclick="applyDiscount()">
+                                                <i class="fas fa-check"></i> Aplicar Descuento
+                                            </button>
+                                            <button type="button" class="btn btn-danger btn-sm" onclick="cancelDiscount()">
+                                                <i class="fas fa-times"></i> Cancelar
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Carrito de Compras Mejorado -->
+                            <div class="shopping-cart-section">
+                                <h4><i class="fas fa-shopping-cart"></i> Carrito de Compras</h4>
+                                <div class="cart-container" id="cart-container">
+                                    <div class="empty-cart" id="empty-cart">
+                                        <i class="fas fa-shopping-cart"></i>
+                                        <p>No hay productos en el carrito</p>
+                                    </div>
+                                    <div class="cart-items" id="cart-items">
+                                        <!-- Los productos del carrito se mostrarán aquí -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sección de Métodos de Pago -->
                             <div class="payment-section">
                                 <h4><i class="fas fa-money-bill-wave"></i> Método de Pago</h4>
                                 
                                 <div class="payment-methods">
-                                    <div class="payment-method" data-method="efectivo">
+                                    <div class="payment-method selected" data-method="efectivo" onclick="selectPaymentMethod('efectivo')">
                                         <i class="fas fa-money-bill-wave"></i>
                                         <span>Efectivo</span>
                                     </div>
-                                    <div class="payment-method" data-method="tarjeta">
+                                    <div class="payment-method" data-method="tarjeta" onclick="selectPaymentMethod('tarjeta')">
                                         <i class="fas fa-credit-card"></i>
                                         <span>Tarjeta</span>
                                     </div>
-                                    <div class="payment-method" data-method="transferencia">
+                                    <div class="payment-method" data-method="transferencia" onclick="selectPaymentMethod('transferencia')">
                                         <i class="fas fa-university"></i>
                                         <span>Transferencia</span>
                                     </div>
-                                    <div class="payment-method" data-method="yape">
+                                    <div class="payment-method" data-method="yape" onclick="selectPaymentMethod('yape')">
                                         <i class="fas fa-mobile-alt"></i>
                                         <span>Yape/Plin</span>
                                     </div>
@@ -327,7 +488,7 @@
                                     <div class="form-group">
                                         <label class="form-label">Monto a Pagar</label>
                                         <div class="payment-input-group">
-                                            <input type="number" id="payment-amount" class="form-control" placeholder="0.00" step="0.01" min="0">
+                                            <input type="number" id="payment-amount" class="form-control" placeholder="0.00" step="0.01" min="0" oninput="calculateRemaining()">
                                             <button type="button" class="btn btn-info" onclick="calculateRemaining()">
                                                 <i class="fas fa-calculator"></i> Calcular
                                             </button>
@@ -376,6 +537,10 @@
                                     <span>Subtotal:</span>
                                     <span>S/ <span id="sale-subtotal">0.00</span></span>
                                 </div>
+                                <div class="total-row discount-row" style="display: none;">
+                                    <span>Descuento:</span>
+                                    <span>- S/ <span id="sale-discount">0.00</span></span>
+                                </div>
                                 <div class="total-row">
                                     <span>IGV (0%):</span>
                                     <span>S/ <span id="sale-igv">0.00</span></span>
@@ -397,6 +562,10 @@
 
                 <!-- Clients Section -->
                 <div id="clients-section" class="section hidden">
+                    <div class="section-header">
+                        <h2><i class="fas fa-users"></i> Gestión de Clientes</h2>
+                    </div>
+                    
                     <div class="card">
                         <div class="card-header">
                             <h3><i class="fas fa-users"></i> Lista de Clientes</h3>
@@ -418,7 +587,14 @@
                                             <th>Acciones</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="clients-table-body"></tbody>
+                                    <tbody id="clients-table-body">
+                                        <tr>
+                                            <td colspan="7" class="empty-state">
+                                                <i class="fas fa-users"></i>
+                                                <p>Cargando clientes...</p>
+                                            </td>
+                                        </tr>
+                                    </tbody>
                                 </table>
                             </div>
                         </div>
@@ -427,6 +603,10 @@
 
                 <!-- Reports Section -->
                 <div id="reports-section" class="section hidden">
+                    <div class="section-header">
+                        <h2><i class="fas fa-chart-bar"></i> Reportes y Estadísticas</h2>
+                    </div>
+                    
                     <div class="card">
                         <div class="card-header">
                             <h3><i class="fas fa-chart-bar"></i> Generar Reporte</h3>
@@ -440,6 +620,7 @@
                                         <option value="sales">Ventas</option>
                                         <option value="products">Productos</option>
                                         <option value="clients">Clientes</option>
+                                        <option value="categories">Categorías</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
@@ -450,6 +631,12 @@
                                         <option value="week">Esta Semana</option>
                                         <option value="month">Este Mes</option>
                                         <option value="year">Este Año</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Categoría (opcional)</label>
+                                    <select id="report-category" class="form-control">
+                                        <option value="">Todas las categorías</option>
                                     </select>
                                 </div>
                                 <button type="submit" class="btn btn-primary">
@@ -487,10 +674,8 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">Categoría</label>
-                            <select id="product-category" class="form-control">
-                                <option>Electrónicos</option>
-                                <option>Hogar</option>
-                                <option>Oficina</option>
+                            <select id="product-category" class="form-control" onchange="handleCategorySelection()" required>
+                                <option value="">Seleccione categoría</option>
                             </select>
                         </div>
                         <div class="form-row">
@@ -588,6 +773,36 @@
         </div>
     </div>
 
+    <!-- Modal Categorías -->
+    <div id="category-modal" class="modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="category-form-title">Agregar Categoría</h3>
+                    <button class="btn-close close-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="category-form">
+                        <div class="form-group">
+                            <label class="form-label">Nombre de la Categoría</label>
+                            <input type="text" id="category-name" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Descripción</label>
+                            <textarea id="category-description" class="form-control" rows="3" placeholder="Descripción opcional de la categoría"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" id="save-category-btn">
+                        <i class="fas fa-save"></i> Guardar
+                    </button>
+                    <button class="btn btn-danger" id="cancel-category-btn">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal Boleta -->
     <div id="sale-receipt-modal" class="modal">
         <div class="modal-dialog" style="max-width: 800px;">
@@ -603,6 +818,9 @@
                     <button class="btn btn-success btn-sm" onclick="printReceipt()" style="padding: 5px 15px;">
                         <i class="fas fa-print"></i> Imprimir
                     </button>
+                    <button class="btn btn-whatsapp btn-sm" onclick="shareToWhatsApp(saleId)" style="padding: 5px 15px;">
+                        <i class="fab fa-whatsapp"></i> WhatsApp
+                    </button>
                     <button class="btn btn-danger btn-sm" onclick="closeReceiptModal()" style="padding: 5px 15px;">Cerrar</button>
                 </div>
             </div>
@@ -616,4 +834,3 @@
     <script src="script.js"></script>
 </body>
 </html>
-
