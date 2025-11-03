@@ -2777,3 +2777,4 @@ function quickAddProduct() {
         showAlert('❌ Primero seleccione un producto', 'error');
     }
 }
+
