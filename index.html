@@ -7,6 +7,8 @@
     <link rel="icon" href="image.png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>    
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 </head>
@@ -42,9 +44,29 @@
                     </a>
                 </div>
                 <div class="nav-item">
+                    <a href="#" class="nav-link" data-section="inventory">
+                        <i class="fas fa-warehouse"></i>
+                        <span>Inventario</span>
+                    </a>
+                </div>
+                <div class="nav-item">
                     <a href="#" class="nav-link" data-section="sales">
                         <i class="fas fa-shopping-cart"></i>
                         <span>Ventas</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" data-section="pending-sales">
+                        <i class="fas fa-clock"></i>
+                        <span>Ventas Pendientes</span>
+                        <span class="pending-badge" id="pending-sales-badge">0</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" data-section="shipping">
+                        <i class="fas fa-shipping-fast"></i>
+                        <span>Control de Envíos</span>
+                        <span class="shipping-badge" id="shipping-badge">0</span>
                     </a>
                 </div>
                 <div class="nav-item">
@@ -88,7 +110,7 @@
             <div class="content-container">
                 <!-- Dashboard Section -->
                 <div id="dashboard-section" class="section">
-                    <!-- Estadísticas -->
+                    <!-- Estadísticas Principales (TUS 6 ESTADÍSTICAS ORIGINALES) -->
                     <div class="stats-grid">
                         <div class="stat-card">
                             <div class="stat-icon">
@@ -97,6 +119,15 @@
                             <div class="stat-info">
                                 <h3 id="total-products">0</h3>
                                 <p>Total Productos</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-money-bill-wave"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="monthly-revenue">S/ 0.00</h3>
+                                <p>Ingresos Mensuales</p>
                             </div>
                         </div>
                         <div class="stat-card">
@@ -110,25 +141,159 @@
                         </div>
                         <div class="stat-card">
                             <div class="stat-icon">
-                                <i class="fas fa-shopping-cart"></i>
+                                <i class="fas fa-shipping-fast"></i>
                             </div>
                             <div class="stat-info">
-                                <h3 id="total-sales">0</h3>
-                                <p>Ventas Totales</p>
+                                <h3 id="total-shipping">0</h3>
+                                <p>Total Envíos</p>
                             </div>
                         </div>
                         <div class="stat-card">
                             <div class="stat-icon">
-                                <i class="fas fa-chart-line"></i>
+                                <i class="fas fa-shopping-cart"></i>
                             </div>
                             <div class="stat-info">
-                                <h3 id="monthly-revenue">S/ 0.00</h3>
-                                <p>Ingresos Mensuales</p>
+                                <h3 id="total-sales">0</h3>
+                                <p>Total Ventas</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="pending-shipping">0</h3>
+                                <p>Envíos Pendientes</p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Ventas Pendientes -->
+                    <!-- NUEVAS ESTADÍSTICAS ADICIONALES (4 más) -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: var(--warning-light); color: var(--warning);">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="low-stock-products">0</h3>
+                                <p>Productos con Stock Bajo</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: var(--success-light); color: var(--success);">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="today-sales">0</h3>
+                                <p>Ventas del Día</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: var(--info-light); color: var(--info);">
+                                <i class="fas fa-receipt"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="average-ticket">S/ 0.00</h3>
+                                <p>Ticket Promedio</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: var(--secondary-light); color: var(--secondary);">
+                                <i class="fas fa-percentage"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="conversion-rate">0%</h3>
+                                <p>Conversión de Ventas</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- GRÁFICOS DE RENDIMIENTO (NUEVOS) -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-chart-bar"></i> Rendimiento de Ventas</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="charts-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                                <div class="chart-container">
+                                    <h4>Ventas Mensuales</h4>
+                                    <canvas id="monthly-sales-chart" width="400" height="200"></canvas>
+                                </div>
+                                <div class="chart-container">
+                                    <h4>Productos Más Vendidos</h4>
+                                    <canvas id="top-products-chart" width="400" height="200"></canvas>
+                                </div>
+                                <div class="chart-container">
+                                    <h4>Métodos de Pago</h4>
+                                    <canvas id="payment-methods-chart" width="400" height="200"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ACTIVIDAD RECIENTE (NUEVA) -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-history"></i> Actividad Reciente</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="activity-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                                <!-- Ventas Recientes -->
+                                <div>
+                                    <h4>Ventas Recientes</h4>
+                                    <div class="table-responsive">
+                                        <table>
+                                            <thead>
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Cliente</th>
+                                                    <th>Total</th>
+                                                    <th>Fecha</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="recent-sales-summary-body">
+                                                <tr>
+                                                    <td colspan="4" class="empty-state">
+                                                        <i class="fas fa-receipt"></i>
+                                                        <p>Cargando ventas...</p>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                
+                                <!-- Productos Recientes -->
+                                <div>
+                                    <h4>Productos Agregados Recientemente</h4>
+                                    <div class="table-responsive">
+                                        <table>
+                                            <thead>
+                                                <tr>
+                                                    <th>Producto</th>
+                                                    <th>Categoría</th>
+                                                    <th>Precio</th>
+                                                    <th>Fecha</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="recent-products-body">
+                                                <tr>
+                                                    <td colspan="4" class="empty-state">
+                                                        <i class="fas fa-box"></i>
+                                                        <p>Cargando productos...</p>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TUS SECCIONES ORIGINALES (SE MANTIENEN) -->
+                    
+                    <!-- Ventas Pendientes (TU SECCIÓN ORIGINAL) -->
                     <div class="card">
                         <div class="card-header">
                             <h3><i class="fas fa-clock"></i> Ventas Pendientes de Pago</h3>
@@ -140,7 +305,7 @@
                         </div>
                     </div>
 
-                    <!-- Alertas -->
+                    <!-- Alertas (TU SECCIÓN ORIGINAL) -->
                     <div class="card">
                         <div class="card-header">
                             <h3><i class="fas fa-exclamation-triangle"></i> Alertas de Stock</h3>
@@ -152,8 +317,8 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- Ventas Recientes -->
+                    
+                    <!-- Ventas Recientes (TU SECCIÓN ORIGINAL) -->
                     <div class="card">
                         <div class="card-header">
                             <h3><i class="fas fa-history"></i> Ventas Recientes</h3>
@@ -183,7 +348,7 @@
                         </div>
                     </div>
                     
-                    <!-- Historial de Ventas -->
+                    <!-- Historial de Ventas (TU SECCIÓN ORIGINAL) -->
                     <div class="card">
                         <div class="card-header">
                             <h3><i class="fas fa-history"></i> Historial de Ventas</h3>
@@ -252,7 +417,7 @@
                     </div>
                 </div>
 
-                <!-- Categories Section (NUEVA SECCIÓN) -->
+                <!-- Categories Section -->
                 <div id="categories-section" class="section hidden">
                     <div class="section-header">
                         <h2><i class="fas fa-tags"></i> Gestión de Categorías</h2>
@@ -291,7 +456,151 @@
                     </div>
                 </div>
 
-                <!-- Sales Section con Interfaz Visual Mejorada -->
+                <!-- Inventory Section -->
+                <div id="inventory-section" class="section hidden">
+                    <div class="section-header">
+                        <h2><i class="fas fa-warehouse"></i> Gestión de Inventario</h2>
+                        <div class="header-actions">
+                            <button class="btn btn-warning" onclick="showStockAdjustmentModal()">
+                                <i class="fas fa-exchange-alt"></i> Ajustar Stock
+                            </button>
+                            <button class="btn btn-primary" onclick="showInventoryEntryModal()">
+                                <i class="fas fa-plus-circle"></i> Entrada de Inventario
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Estadísticas de Inventario -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon inventory-icon">
+                                <i class="fas fa-boxes"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="total-inventory-value">S/ 0.00</h3>
+                                <p>Valor Total Inventario</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon low-stock-icon">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="low-stock-count">0</h3>
+                                <p>Productos Stock Bajo</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon out-of-stock-icon">
+                                <i class="fas fa-times-circle"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="out-of-stock-count">0</h3>
+                                <p>Productos Sin Stock</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon movement-icon">
+                                <i class="fas fa-exchange-alt"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="monthly-movements">0</h3>
+                                <p>Movimientos del Mes</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Alertas de Stock -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-exclamation-triangle"></i> Alertas de Stock Crítico</h3>
+                        </div>
+                        <div class="card-body">
+                            <div id="critical-stock-alerts">
+                                <!-- Las alertas se cargarán aquí dinámicamente -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gestión de Stock -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-boxes"></i> Control de Stock</h3>
+                            <div class="card-actions">
+                                <input type="text" id="inventory-search" class="form-control search-input" 
+                                       placeholder="🔍 Buscar productos..." oninput="filterInventory()">
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Producto</th>
+                                            <th>Categoría</th>
+                                            <th>Stock Actual</th>
+                                            <th>Stock Mínimo</th>
+                                            <th>Estado</th>
+                                            <th>Valor en Stock</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="inventory-table-body">
+                                        <tr>
+                                            <td colspan="7" class="empty-state">
+                                                <i class="fas fa-boxes"></i>
+                                                <p>Cargando inventario...</p>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Movimientos de Inventario -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-exchange-alt"></i> Historial de Movimientos</h3>
+                            <div class="card-actions">
+                                <select id="movement-filter" class="form-control" onchange="filterMovements()">
+                                    <option value="all">Todos los movimientos</option>
+                                    <option value="entry">Entradas</option>
+                                    <option value="sale">Ventas</option>
+                                    <option value="adjustment">Ajustes</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Fecha</th>
+                                            <th>Producto</th>
+                                            <th>Tipo</th>
+                                            <th>Cantidad</th>
+                                            <th>Stock Anterior</th>
+                                            <th>Stock Nuevo</th>
+                                            <th>Motivo</th>
+                                            <th>Usuario</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="movements-table-body">
+                                        <tr>
+                                            <td colspan="8" class="empty-state">
+                                                <i class="fas fa-exchange-alt"></i>
+                                                <p>Cargando movimientos...</p>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sales Section -->
                 <div id="sales-section" class="section hidden">
                     <div class="section-header">
                         <h2><i class="fas fa-shopping-cart"></i> Gestión de Ventas</h2>
@@ -355,14 +664,10 @@
                                     <button type="button" class="btn btn-primary" id="add-selected-product">
                                         <i class="fas fa-cart-plus"></i> Agregar
                                     </button>
-                                    <!-- Botón Agregar tradicional (oculto pero funcional) -->
-                                    <button type="button" class="btn btn-primary hidden" id="add-to-sale-btn" onclick="quickAddProduct()">
-                                        <i class="fas fa-cart-plus"></i> Agregar
-                                    </button>
                                 </div>
                             </div>
 
-                            <!-- Sección de Descuentos MEJORADA -->
+                            <!-- Sección de Descuentos -->
                             <div class="discount-section">
                                 <div class="form-group">
                                     <label class="form-label">
@@ -432,7 +737,7 @@
                                 </div>
                             </div>
 
-                            <!-- Carrito de Compras Mejorado -->
+                            <!-- Carrito de Compras -->
                             <div class="shopping-cart-section">
                                 <h4><i class="fas fa-shopping-cart"></i> Carrito de Compras</h4>
                                 <div class="cart-container" id="cart-container">
@@ -442,6 +747,69 @@
                                     </div>
                                     <div class="cart-items" id="cart-items">
                                         <!-- Los productos del carrito se mostrarán aquí -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sección de Envío -->
+                            <div class="shipping-section">
+                                <h4><i class="fas fa-truck"></i> Información de Envío</h4>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <input type="checkbox" id="requires-shipping" onchange="toggleShippingSection()">
+                                        ¿Requiere envío a otra ciudad?
+                                    </label>
+                                </div>
+
+                                <div id="shipping-info-section" class="hidden">
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label">Ciudad de Destino</label>
+                                            <select id="shipping-city" class="form-control" onchange="calculateShippingCost()">
+                                                <option value="">Seleccione ciudad</option>
+                                                <!-- Las ciudades se cargarán dinámicamente -->
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Dirección de Entrega</label>
+                                            <input type="text" id="shipping-address" class="form-control" 
+                                                   placeholder="Dirección completa para la entrega">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label">Referencia</label>
+                                            <input type="text" id="shipping-reference" class="form-control" 
+                                                   placeholder="Punto de referencia">
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Teléfono de Contacto</label>
+                                            <input type="tel" id="shipping-phone" class="form-control" 
+                                                   placeholder="Teléfono para coordinaciones">
+                                        </div>
+                                    </div>
+
+                                    <div class="shipping-cost-preview">
+                                        <div class="cost-item">
+                                            <span>Costo de Envío:</span>
+                                            <span id="shipping-cost-display">S/ 0.00</span>
+                                        </div>
+                                        <div class="cost-item">
+                                            <span>Tiempo Estimado:</span>
+                                            <span id="shipping-time-display">-</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Código de Seguimiento Generado -->
+                                    <div class="tracking-code-generated hidden" id="tracking-code-section">
+                                        <div class="alert alert-info">
+                                            <i class="fas fa-qrcode"></i>
+                                            <strong>Código de Seguimiento Generado: </strong>
+                                            <span id="generated-tracking-code" class="tracking-code-badge"></span>
+                                            <small>Guarde este código para rastrear el envío</small>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -515,7 +883,7 @@
                                     </div>
                                 </div>
 
-                                <!-- Pago normal (sin selección de productos) -->
+                                <!-- Pago normal -->
                                 <div id="normal-payment-section">
                                     <div class="form-group">
                                         <label class="form-label">Monto Recibido</label>
@@ -560,18 +928,99 @@
                     </div>
                 </div>
 
-                <!-- Clients Section -->
-                <div id="clients-section" class="section hidden">
+                <!-- Pending Sales Section -->
+                <div id="pending-sales-section" class="section hidden">
                     <div class="section-header">
-                        <h2><i class="fas fa-users"></i> Gestión de Clientes</h2>
+                        <h2><i class="fas fa-clock"></i> Ventas Pendientes y Separadas</h2>
+                        <div class="header-actions">
+                            <button class="btn btn-info" onclick="exportPendingSales()">
+                                <i class="fas fa-file-export"></i> Exportar
+                            </button>
+                        </div>
                     </div>
-                    
+
+                    <!-- Filtros -->
                     <div class="card">
                         <div class="card-header">
-                            <h3><i class="fas fa-users"></i> Lista de Clientes</h3>
-                            <button class="btn btn-primary" id="add-client-btn">
-                                <i class="fas fa-plus"></i> Agregar Cliente
-                            </button>
+                            <h3><i class="fas fa-filter"></i> Filtros</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="filter-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Estado</label>
+                                    <select id="pending-status-filter" class="form-control" onchange="filterPendingSales()">
+                                        <option value="all">Todos los estados</option>
+                                        <option value="Separado">Separado</option>
+                                        <option value="Parcial">Pago Parcial</option>
+                                        <option value="Entregado">Entregado</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Cliente</label>
+                                    <input type="text" id="pending-client-filter" class="form-control" 
+                                        placeholder="Buscar por cliente..." oninput="filterPendingSales()">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Fecha</label>
+                                    <input type="date" id="pending-date-filter" class="form-control" onchange="filterPendingSales()">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Producto</label>
+                                    <input type="text" id="pending-product-filter" class="form-control" 
+                                        placeholder="Buscar por producto..." oninput="filterPendingSales()">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Resumen de Ventas Pendientes -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon pending-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="total-pending-sales">0</h3>
+                                <p>Total Pendientes</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon amount-icon">
+                                <i class="fas fa-money-bill-wave"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="total-pending-amount">S/ 0.00</h3>
+                                <p>Monto Pendiente</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon delivered-icon">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="total-delivered">0</h3>
+                                <p>Entregadas</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon overdue-icon">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="overdue-sales">0</h3>
+                                <p>Vencidas</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Lista de Ventas Pendientes -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-list"></i> Lista de Ventas Pendientes</h3>
+                            <div class="card-actions">
+                                <input type="text" id="pending-search" class="form-control search-input" 
+                                    placeholder="🔍 Buscar en pendientes..." oninput="filterPendingSales()">
+                            </div>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
@@ -579,11 +1028,203 @@
                                     <thead>
                                         <tr>
                                             <th>ID</th>
-                                            <th>DNI</th>
+                                            <th>Cliente</th>
+                                            <th>Fecha Separación</th>
+                                            <th>Productos</th>
+                                            <th>Total</th>
+                                            <th>Pagado</th>
+                                            <th>Pendiente</th>
+                                            <th>Estado</th>
+                                            <th>Vencimiento</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="pending-sales-table-body">
+                                        <tr>
+                                            <td colspan="10" class="empty-state">
+                                                <i class="fas fa-clock"></i>
+                                                <p>No hay ventas pendientes</p>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Shipping Control Section -->
+                <div id="shipping-section" class="section hidden">
+                    <div class="section-header">
+                        <h2><i class="fas fa-shipping-fast"></i> Control de Envíos</h2>
+                        <div class="header-actions">
+                            <button class="btn btn-info" onclick="exportShippingReport()">
+                                <i class="fas fa-file-export"></i> Exportar
+                            </button>
+                            <button class="btn btn-primary" onclick="showShippingConfigModal()">
+                                <i class="fas fa-cog"></i> Configurar Ciudades
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Estadísticas de Envíos -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon shipping-pending-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="total-pending-shipping">0</h3>
+                                <p>Envíos Pendientes</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon shipping-transit-icon">
+                                <i class="fas fa-truck"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="total-in-transit">0</h3>
+                                <p>En Tránsito</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon shipping-delivered-icon">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="total-delivered">0</h3>
+                                <p>Entregados</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon shipping-cities-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="total-cities">0</h3>
+                                <p>Ciudades Activas</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filtros Rápidos -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-filter"></i> Filtros Rápidos</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="shipping-filters">
+                                <div class="filter-buttons">
+                                    <button class="btn btn-outline-primary active" onclick="filterShipping('all')">
+                                        Todos (<span id="count-all">0</span>)
+                                    </button>
+                                    <button class="btn btn-outline-warning" onclick="filterShipping('pending')">
+                                        Pendientes (<span id="count-pending">0</span>)
+                                    </button>
+                                    <button class="btn btn-outline-info" onclick="filterShipping('transit')">
+                                        En Tránsito (<span id="count-transit">0</span>)
+                                    </button>
+                                    <button class="btn btn-outline-success" onclick="filterShipping('delivered')">
+                                        Entregados (<span id="count-delivered">0</span>)
+                                    </button>
+                                    <button class="btn btn-outline-danger" onclick="filterShipping('cancelled')">
+                                        Cancelados (<span id="count-cancelled">0</span>)
+                                    </button>
+                                </div>
+                                
+                                <div class="filter-advanced">
+                                    <div class="form-group">
+                                        <label class="form-label">Buscar por código o cliente:</label>
+                                        <input type="text" id="shipping-search" class="form-control" 
+                                               placeholder="🔍 Código, cliente, ciudad..." oninput="searchShipping()">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Ciudad:</label>
+                                        <select id="shipping-city-filter" class="form-control" onchange="filterByCity()">
+                                            <option value="all">Todas las ciudades</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Lista de Envíos -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-list"></i> Control de Envíos</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 20%;">Cliente</th>
+                                            <th style="width: 15%;">Ciudad</th>
+                                            <th style="width: 20%;">Dirección</th>
+                                            <th style="width: 10%;">Fecha</th>
+                                            <th style="width: 15%;">Código</th>
+                                            <th style="width: 10%;">Estado</th>
+                                            <th style="width: 20%;">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="shipping-table-body">
+                                        <tr>
+                                            <td colspan="7" class="empty-state">
+                                                <i class="fas fa-shipping-fast"></i>
+                                                <p>No hay envíos registrados</p>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mapa de Envíos (Opcional) -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-map"></i> Distribución de Envíos por Ciudad</h3>
+                        </div>
+                        <div class="card-body">
+                            <div id="shipping-map" class="shipping-map">
+                                <div class="map-placeholder">
+                                    <i class="fas fa-map-marked-alt"></i>
+                                    <p>Mapa de distribución de envíos</p>
+                                    <small>Aquí se mostraría un mapa con los envíos por ciudad</small>
+                                </div>
+                            </div>
+                            <div class="cities-distribution" id="cities-distribution">
+                                <!-- La distribución por ciudades se cargará aquí -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Clients Section -->
+                <div id="clients-section" class="section hidden">
+                    <div class="section-header">
+                        <h2><i class="fas fa-users"></i> Gestión de Clientes</h2>
+                        <button class="btn btn-primary" id="add-client-btn">
+                            <i class="fas fa-plus"></i> Agregar Cliente
+                        </button>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-users"></i> Lista de Clientes</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
                                             <th>Nombre</th>
                                             <th>Email</th>
                                             <th>Teléfono</th>
-                                            <th>Tipo</th>
+                                            <th>Dirección</th>
+                                            <th>Compras</th>
                                             <th>Acciones</th>
                                         </tr>
                                     </thead>
@@ -601,236 +1242,750 @@
                     </div>
                 </div>
 
-                <!-- Reports Section -->
+               <!-- Reports Section -->
                 <div id="reports-section" class="section hidden">
                     <div class="section-header">
                         <h2><i class="fas fa-chart-bar"></i> Reportes y Estadísticas</h2>
+                        <div class="action-buttons">
+                            <button class="btn btn-success" onclick="generateReport('daily')">
+                                <i class="fas fa-file-export"></i> Exportar PDF
+                            </button>
+                            <button class="btn btn-primary" onclick="refreshReports()">
+                                <i class="fas fa-sync-alt"></i> Actualizar
+                            </button>
+                        </div>
                     </div>
                     
+                    <!-- Filtros de Reportes -->
                     <div class="card">
                         <div class="card-header">
-                            <h3><i class="fas fa-chart-bar"></i> Generar Reporte</h3>
+                            <h3><i class="fas fa-filter"></i> Filtros de Reportes</h3>
                         </div>
                         <div class="card-body">
-                            <form id="report-form">
+                            <div class="form-row">
                                 <div class="form-group">
                                     <label class="form-label">Tipo de Reporte</label>
-                                    <select id="report-type" class="form-control">
-                                        <option value="">Seleccione...</option>
+                                    <select id="report-type" class="form-control" onchange="changeReportType()">
                                         <option value="sales">Ventas</option>
                                         <option value="products">Productos</option>
                                         <option value="clients">Clientes</option>
-                                        <option value="categories">Categorías</option>
+                                        <option value="inventory">Inventario</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">Período</label>
-                                    <select id="report-period" class="form-control">
-                                        <option value="">Seleccione...</option>
+                                    <select id="report-period" class="form-control" onchange="loadReportsData()">
                                         <option value="today">Hoy</option>
                                         <option value="week">Esta Semana</option>
-                                        <option value="month">Este Mes</option>
+                                        <option value="month" selected>Este Mes</option>
+                                        <option value="quarter">Este Trimestre</option>
                                         <option value="year">Este Año</option>
+                                        <option value="custom">Personalizado</option>
                                     </select>
                                 </div>
-                                <div class="form-group">
-                                    <label class="form-label">Categoría (opcional)</label>
-                                    <select id="report-category" class="form-control">
-                                        <option value="">Todas las categorías</option>
-                                    </select>
+                                <div class="form-group" id="custom-date-range" style="display: none;">
+                                    <label class="form-label">Rango de Fechas</label>
+                                    <div style="display: flex; gap: 10px;">
+                                        <input type="date" id="start-date" class="form-control">
+                                        <input type="date" id="end-date" class="form-control">
+                                    </div>
                                 </div>
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-file-export"></i> Generar
-                                </button>
-                            </form>
+                            </div>
                         </div>
                     </div>
-                    <div id="report-results" class="card hidden">
+
+                    <!-- Estadísticas Principales -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-money-bill-wave"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="total-revenue">S/ 0.00</h3>
+                                <p>Ingresos Totales</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="total-sales-count">0</h3>
+                                <p>Ventas Realizadas</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-box"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="total-products-sold">0</h3>
+                                <p>Productos Vendidos</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="unique-clients">0</h3>
+                                <p>Clientes Únicos</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gráficos y Visualizaciones -->
+                    <div class="card">
                         <div class="card-header">
-                            <h3><i class="fas fa-chart-pie"></i> Resultados</h3>
+                            <h3><i class="fas fa-chart-line"></i> Tendencia de Ventas</h3>
                         </div>
                         <div class="card-body">
-                            <div id="report-content"></div>
+                            <div id="sales-chart-container">
+                                <canvas id="sales-chart" width="400" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reporte de Productos Más Vendidos -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-trophy"></i> Productos Más Vendidos</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Producto</th>
+                                            <th>Cantidad Vendida</th>
+                                            <th>Ingresos</th>
+                                            <th>% del Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="top-products-body">
+                                        <!-- Los datos se cargarán aquí -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Métodos de Pago -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-credit-card"></i> Métodos de Pago</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="payment-methods-stats">
+                                <div id="payment-methods-chart">
+                                    <canvas id="payment-chart" width="300" height="300"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ventas por Categoría -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-tags"></i> Ventas por Categoría</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Categoría</th>
+                                            <th>Ventas</th>
+                                            <th>Ingresos</th>
+                                            <th>Productos Vendidos</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="category-sales-body">
+                                        <!-- Los datos se cargarán aquí -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reporte de Clientes -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-users"></i> Clientes Más Activos</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Cliente</th>
+                                            <th>Compras</th>
+                                            <th>Total Gastado</th>
+                                            <th>Última Compra</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="top-clients-body">
+                                        <!-- Los datos se cargarán aquí -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Alertas de Stock -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-exclamation-triangle"></i> Alertas de Inventario</h3>
+                        </div>
+                        <div class="card-body">
+                            <div id="stock-alerts-container">
+                                <!-- Las alertas se cargarán aquí -->
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </main>
-    </div>
 
-    <!-- Modal Productos -->
-    <div id="product-modal" class="modal">
-        <div class="modal-dialog">
+    <!-- Modal Detalles de Envío -->
+    <div id="shipping-details-modal" class="modal">
+        <div class="modal-dialog" style="max-width: 800px;">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3 id="product-form-title">Agregar Producto</h3>
+                    <h3><i class="fas fa-shipping-fast"></i> Detalles del Envío</h3>
                     <button class="btn-close close-modal">&times;</button>
                 </div>
                 <div class="modal-body">
-                    <form id="product-form">
-                        <div class="form-group">
-                            <label class="form-label">Nombre</label>
-                            <input type="text" id="product-name" class="form-control" required>
+                    <div class="shipping-details-container" id="shipping-details-content">
+                        <!-- Los detalles se cargarán dinámicamente -->
+                    </div>
+                    
+                    <!-- Código de Seguimiento -->
+                    <div class="tracking-section">
+                        <h4><i class="fas fa-qrcode"></i> Código de Seguimiento</h4>
+                        <div class="tracking-code-display">
+                            <div class="tracking-code" id="tracking-code-display">
+                                <!-- Código se mostrará aquí -->
+                            </div>
+                            <button class="btn btn-info btn-sm" onclick="copyTrackingCode()">
+                                <i class="fas fa-copy"></i> Copiar Código
+                            </button>
+                            <button class="btn btn-success btn-sm" onclick="printTrackingCode()">
+                                <i class="fas fa-print"></i> Imprimir
+                            </button>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">Categoría</label>
-                            <select id="product-category" class="form-control" onchange="handleCategorySelection()" required>
-                                <option value="">Seleccione categoría</option>
-                            </select>
+                    </div>
+
+                    <!-- Historial de Estados -->
+                    <div class="shipping-timeline">
+                        <h4><i class="fas fa-history"></i> Historial del Envío</h4>
+                        <div id="shipping-timeline-content">
+                            <!-- Timeline se cargará aquí -->
                         </div>
+                    </div>
+
+                    <!-- Actualizar Estado -->
+                    <div class="update-status-section">
+                        <h4><i class="fas fa-edit"></i> Actualizar Estado</h4>
                         <div class="form-row">
                             <div class="form-group">
-                                <label class="form-label">Precio</label>
-                                <input type="number" id="product-price" class="form-control" step="0.01" required>
+                                <label class="form-label">Nuevo Estado</label>
+                                <select id="shipping-status-update" class="form-control">
+                                    <option value="pending">Pendiente</option>
+                                    <option value="preparing">Preparando</option>
+                                    <option value="transit">En Tránsito</option>
+                                    <option value="delivered">Entregado</option>
+                                    <option value="cancelled">Cancelado</option>
+                                </select>
                             </div>
                             <div class="form-group">
-                                <label class="form-label">Stock</label>
-                                <input type="number" id="product-stock" class="form-control" required>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label">Costo</label>
-                                <input type="number" id="product-cost" class="form-control" step="0.01">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Stock Mínimo</label>
-                                <input type="number" id="product-min-stock" class="form-control" value="5">
+                                <label class="form-label">Fecha Actualización</label>
+                                <input type="datetime-local" id="status-update-date" class="form-control">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Descripción</label>
-                            <textarea id="product-description" class="form-control" rows="3"></textarea>
+                            <label class="form-label">Observaciones</label>
+                            <textarea id="status-update-notes" class="form-control" rows="3" 
+                                      placeholder="Observaciones sobre el estado del envío..."></textarea>
                         </div>
-                    </form>
+                    </div>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-primary" id="save-product-btn">
-                        <i class="fas fa-save"></i> Guardar
+                    <button class="btn btn-primary" onclick="updateShippingStatus()">
+                        <i class="fas fa-save"></i> Actualizar Estado
                     </button>
-                    <button class="btn btn-danger" id="cancel-product-btn">Cancelar</button>
+                    <button class="btn btn-warning" onclick="sendTrackingSMS()">
+                        <i class="fas fa-sms"></i> Enviar SMS
+                    </button>
+                    <button class="btn btn-info" onclick="generateShippingLabel()">
+                        <i class="fas fa-tag"></i> Etiqueta
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal Clientes con API RENIEC -->
-    <div id="client-modal" class="modal">
-        <div class="modal-dialog">
+    <!-- Modal Configuración de Ciudades -->
+    <div id="shipping-config-modal" class="modal">
+        <div class="modal-dialog" style="max-width: 700px;">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3 id="client-form-title">Agregar Cliente</h3>
+                    <h3><i class="fas fa-cog"></i> Configurar Ciudades de Envío</h3>
                     <button class="btn-close close-modal">&times;</button>
                 </div>
                 <div class="modal-body">
-                    <form id="client-form">
-                        <div class="form-group">
-                            <label class="form-label">DNI</label>
-                            <div class="input-wrapper">
-                                <input type="text" id="client-dni" class="form-control form-control-with-btn" 
-                                       maxlength="8" pattern="[0-9]{8}" placeholder="Ingrese DNI de 8 dígitos" required>
-                                <button type="button" class="dni-search-btn" id="search-dni-btn">
-                                    <i class="fas fa-search"></i> Buscar
-                                </button>
+                    <div class="config-section">
+                        <h4><i class="fas fa-plus-circle"></i> Agregar Nueva Ciudad</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Nombre de la Ciudad</label>
+                                <input type="text" id="new-city-name" class="form-control" 
+                                       placeholder="Ej: Huancayo, Lima, Arequipa...">
                             </div>
-                            <small style="color: var(--gray-600); font-size: 12px;">
-                                <i class="fas fa-info-circle"></i> Ingrese el DNI y presione Buscar para autocompletar
-                            </small>
+                            <div class="form-group">
+                                <label class="form-label">Costo de Envío (S/)</label>
+                                <input type="number" id="new-city-cost" class="form-control" 
+                                       step="0.01" min="0" placeholder="0.00">
+                            </div>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Nombre Completo</label>
-                            <input type="text" id="client-name" class="form-control" required readonly>
+                            <label class="form-label">Tiempo de Entrega Estimado</label>
+                            <input type="text" id="new-city-time" class="form-control" 
+                                   placeholder="Ej: 2-3 días, 1 semana...">
                         </div>
+                        <button class="btn btn-primary" onclick="addNewCity()">
+                            <i class="fas fa-plus"></i> Agregar Ciudad
+                        </button>
+                    </div>
+
+                    <div class="cities-list-section">
+                        <h4><i class="fas fa-list"></i> Ciudades Configuradas</h4>
+                        <div id="cities-list" class="cities-list">
+                            <!-- Lista de ciudades se cargará aquí -->
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success" onclick="saveShippingConfig()">
+                        <i class="fas fa-save"></i> Guardar Configuración
+                    </button>
+                    <button class="btn btn-danger" onclick="hideShippingConfigModal()">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<!-- Modal Producto - AGREGAR ESTE CAMPO -->
+<div id="product-modal" class="modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="product-form-title">Agregar Producto</h3>
+                <button class="btn-close close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="product-form">
+                    <!-- CAMPO PARA SUBIR IMAGEN DESDE EL ORDENADOR -->
+                    <div class="form-group">
+                        <label class="form-label">Imagen del Producto</label>
+                        <input type="file" id="product-image-file" class="form-control" 
+                               accept="image/*" onchange="previewImage(this)">
+                        <small class="form-text">Formatos: JPG, PNG, GIF (Máx. 2MB)</small>
+                    </div>
+                    
+                    <!-- VISTA PREVIA DE LA IMAGEN -->
+                    <div class="image-preview" id="image-preview" style="display: none; margin-bottom: 15px;">
+                        <p><strong>Vista previa:</strong></p>
+                        <img id="preview-image" src="" alt="Vista previa" 
+                             style="max-width: 200px; max-height: 150px; border-radius: 8px; border: 1px solid #ddd;">
+                        <br>
+                        <button type="button" class="btn btn-danger btn-sm mt-2" onclick="removeImage()">
+                            <i class="fas fa-trash"></i> Quitar imagen
+                        </button>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Nombre del Producto</label>
+                        <input type="text" id="product-name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Categoría</label>
+                        <select id="product-category" class="form-control" required>
+                            <option value="">Seleccione categoría</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Precio (S/)</label>
+                            <input type="number" id="product-price" class="form-control" step="0.01" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Costo (S/)</label>
+                            <input type="number" id="product-cost" class="form-control" step="0.01" min="0">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Stock</label>
+                            <input type="number" id="product-stock" class="form-control" min="0" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Stock Mínimo</label>
+                            <input type="number" id="product-min-stock" class="form-control" min="0" value="5">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Descripción</label>
+                        <textarea id="product-description" class="form-control" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="saveProduct()">Guardar Producto</button>
+                <button class="btn btn-danger" onclick="hideProductForm()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Cliente -->
+<div id="client-modal" class="modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="client-form-title">Agregar Cliente</h3>
+                <button class="btn-close close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="client-form">
+                    <div class="form-group">
+                        <label class="form-label">DNI</label>
+                        <div class="input-with-button">
+                            <input type="text" id="client-dni" class="form-control" maxlength="8" required>
+                            <button type="button" class="btn btn-info" id="search-dni-btn" onclick="searchDNI()">
+                                <i class="fas fa-search"></i> Buscar
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Nombre Completo</label>
+                        <input type="text" id="client-name" class="form-control" required readonly>
+                    </div>
+                    <div class="form-row">
                         <div class="form-group">
                             <label class="form-label">Email</label>
-                            <input type="email" id="client-email" class="form-control" required>
+                            <input type="email" id="client-email" class="form-control">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Teléfono</label>
                             <input type="tel" id="client-phone" class="form-control">
                         </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Dirección</label>
+                        <input type="text" id="client-address" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Tipo de Cliente</label>
+                        <select id="client-type" class="form-control">
+                            <option value="regular">Regular</option>
+                            <option value="premium">Premium</option>
+                            <option value="corporativo">Corporativo</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="saveClient()">Guardar Cliente</button>
+                <button class="btn btn-danger" onclick="hideClientForm()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Categoría -->
+<div id="category-modal" class="modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="category-form-title">Agregar Categoría</h3>
+                <button class="btn-close close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="category-form">
+                    <div class="form-group">
+                        <label class="form-label">Nombre de la Categoría</label>
+                        <input type="text" id="category-name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Descripción</label>
+                        <textarea id="category-description" class="form-control" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="saveCategory()">Guardar Categoría</button>
+                <button class="btn btn-danger" onclick="hideCategoryForm()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Recibo -->
+<div id="sale-receipt-modal" class="modal">
+    <div class="modal-dialog" style="max-width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-receipt"></i> Comprobante de Venta</h3>
+                <button class="btn-close close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="receipt-content">
+                    <!-- El recibo se cargará aquí -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success" onclick="printReceipt()">
+                    <i class="fas fa-print"></i> Imprimir
+                </button>
+                <button class="btn btn-danger" onclick="closeReceiptModal()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Ajuste de Stock -->
+<div id="stock-adjustment-modal" class="modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-exchange-alt"></i> Ajustar Stock</h3>
+                <button class="btn-close close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="stock-adjustment-form">
+                    <div class="form-group">
+                        <label class="form-label">Producto</label>
+                        <select id="adjustment-product" class="form-control" onchange="loadProductStockInfo()" required>
+                            <option value="">Seleccione producto</option>
+                        </select>
+                    </div>
+                    
+                    <div id="stock-info-card" class="info-card" style="display: none;">
+                        <h5>Información Actual</h5>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <label>Stock Actual:</label>
+                                <span id="current-stock">0</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Stock Mínimo:</label>
+                                <span id="min-stock">0</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Valor Unitario:</label>
+                                <span id="unit-value">S/ 0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Tipo de Ajuste</label>
+                        <select id="adjustment-type" class="form-control" required>
+                            <option value="increment">Incrementar Stock</option>
+                            <option value="decrement">Reducir Stock</option>
+                            <option value="set">Establecer Stock Exacto</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Cantidad</label>
+                        <input type="number" id="adjustment-quantity" class="form-control" min="1" value="1" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Motivo del Ajuste</label>
+                        <select id="adjustment-reason" class="form-control" onchange="toggleAdjustmentReason()" required>
+                            <option value="">Seleccione motivo</option>
+                            <option value="inventario">Conteo de inventario</option>
+                            <option value="daño">Producto dañado</option>
+                            <option value="devolucion">Devolución de cliente</option>
+                            <option value="error">Error en registro</option>
+                            <option value="other">Otro</option>
+                        </select>
+                    </div>
+                    
+                    <div id="custom-reason-container" style="display: none;">
                         <div class="form-group">
-                            <label class="form-label">Dirección</label>
-                            <textarea id="client-address" class="form-control" rows="2"></textarea>
+                            <label class="form-label">Motivo personalizado</label>
+                            <input type="text" id="custom-adjustment-reason" class="form-control">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Observaciones</label>
+                        <textarea id="adjustment-notes" class="form-control" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="applyStockAdjustment()">Aplicar Ajuste</button>
+                <button class="btn btn-danger" onclick="hideStockAdjustmentModal()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Entrada de Inventario -->
+<div id="inventory-entry-modal" class="modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-plus-circle"></i> Entrada de Inventario</h3>
+                <button class="btn-close close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="inventory-entry-form">
+                    <div class="form-group">
+                        <label class="form-label">Producto</label>
+                        <select id="entry-product" class="form-control" onchange="loadProductCostInfo()" required>
+                            <option value="">Seleccione producto</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Cantidad</label>
+                        <input type="number" id="entry-quantity" class="form-control" min="1" value="1" required oninput="calculateEntryTotalCost()">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Costo Unitario (S/)</label>
+                            <input type="number" id="entry-unit-cost" class="form-control" step="0.01" min="0" required oninput="calculateEntryTotalCost()">
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Tipo de Cliente</label>
-                            <select id="client-type" class="form-control">
-                                <option value="regular">Regular</option>
-                                <option value="premium">Premium</option>
-                                <option value="corporativo">Corporativo</option>
+                            <label class="form-label">Costo Total (S/)</label>
+                            <input type="number" id="entry-total-cost" class="form-control" step="0.01" readonly>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Proveedor</label>
+                        <input type="text" id="entry-supplier" class="form-control">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">N° Factura/Guía</label>
+                            <input type="text" id="entry-invoice" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Fecha</label>
+                            <input type="date" id="entry-date" class="form-control">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Observaciones</label>
+                        <textarea id="entry-notes" class="form-control" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="saveInventoryEntry()">Guardar Entrada</button>
+                <button class="btn btn-danger" onclick="hideInventoryEntryModal()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Gestión Venta Pendiente -->
+<div id="pending-sale-modal" class="modal">
+    <div class="modal-dialog" style="max-width: 900px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-edit"></i> Gestionar Venta Pendiente</h3>
+                <button class="btn-close close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="pending-sale-details">
+                    <!-- Detalles de la venta -->
+                </div>
+                
+                <div class="management-section">
+                    <h4>Gestión de Pago</h4>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Pago Adicional (S/)</label>
+                            <input type="number" id="additional-payment" class="form-control" step="0.01" min="0" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Método de Pago</label>
+                            <select id="additional-payment-method" class="form-control">
+                                <option value="efectivo">Efectivo</option>
+                                <option value="tarjeta">Tarjeta</option>
+                                <option value="transferencia">Transferencia</option>
                             </select>
                         </div>
-                    </form>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Notas del Pago</label>
+                        <textarea id="payment-notes" class="form-control" rows="2"></textarea>
+                    </div>
                 </div>
-                <div class="modal-footer">
-                    <button class="btn btn-primary" id="save-client-btn">
-                        <i class="fas fa-save"></i> Guardar
-                    </button>
-                    <button class="btn btn-danger" id="cancel-client-btn">Cancelar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Categorías -->
-    <div id="category-modal" class="modal">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 id="category-form-title">Agregar Categoría</h3>
-                    <button class="btn-close close-modal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <form id="category-form">
+                
+                <div class="management-section">
+                    <h4>Gestión de Entrega</h4>
+                    <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label">Nombre de la Categoría</label>
-                            <input type="text" id="category-name" class="form-control" required>
+                            <label class="form-label">Estado de Entrega</label>
+                            <select id="delivery-status" class="form-control" onchange="toggleDeliveryFields()">
+                                <option value="pending">Pendiente</option>
+                                <option value="preparing">Preparando</option>
+                                <option value="transit">En Tránsito</option>
+                                <option value="delivered">Entregado</option>
+                            </select>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Descripción</label>
-                            <textarea id="category-description" class="form-control" rows="3" placeholder="Descripción opcional de la categoría"></textarea>
+                            <label class="form-label">Fecha de Entrega</label>
+                            <input type="date" id="delivery-date" class="form-control">
                         </div>
-                    </form>
+                    </div>
+                    <div id="delivery-notes-container" style="display: none;">
+                        <div class="form-group">
+                            <label class="form-label">Notas de Entrega</label>
+                            <textarea id="delivery-notes" class="form-control" rows="3"></textarea>
+                        </div>
+                    </div>
                 </div>
-                <div class="modal-footer">
-                    <button class="btn btn-primary" id="save-category-btn">
-                        <i class="fas fa-save"></i> Guardar
-                    </button>
-                    <button class="btn btn-danger" id="cancel-category-btn">Cancelar</button>
+                
+                <div class="history-section">
+                    <h4>Historial</h4>
+                    <div id="sale-history-timeline" class="timeline">
+                        <!-- Timeline se cargará aquí -->
+                    </div>
                 </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success" onclick="savePendingSaleManagement()">
+                    <i class="fas fa-save"></i> Guardar Gestión
+                </button>
+                <button class="btn btn-primary" onclick="markAsDelivered()">
+                    <i class="fas fa-check"></i> Marcar como Entregado
+                </button>
+                <button class="btn btn-warning" onclick="printPendingSaleReceipt()">
+                    <i class="fas fa-print"></i> Imprimir Recibo
+                </button>
+                <button class="btn btn-danger" onclick="cancelPendingSale()">
+                    <i class="fas fa-times"></i> Cancelar Venta
+                </button>
             </div>
         </div>
     </div>
-
-    <!-- Modal Boleta -->
-    <div id="sale-receipt-modal" class="modal">
-        <div class="modal-dialog" style="max-width: 800px;">
-            <div class="modal-content">
-                <div class="modal-header" style="padding: 10px 15px;">
-                    <h3 style="font-size: 16px; margin: 0;">Comprobante de Venta</h3>
-                    <button class="btn-close close-modal" style="font-size: 14px;">&times;</button>
-                </div>
-                <div class="modal-body" style="padding: 0;">
-                    <div id="receipt-content"></div>
-                </div>
-                <div class="modal-footer" style="padding: 10px 15px; justify-content: center; gap: 10px;">
-                    <button class="btn btn-success btn-sm" onclick="printReceipt()" style="padding: 5px 15px;">
-                        <i class="fas fa-print"></i> Imprimir
-                    </button>
-                    <button class="btn btn-whatsapp btn-sm" onclick="shareToWhatsApp(saleId)" style="padding: 5px 15px;">
-                        <i class="fab fa-whatsapp"></i> WhatsApp
-                    </button>
-                    <button class="btn btn-danger btn-sm" onclick="closeReceiptModal()" style="padding: 5px 15px;">Cerrar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Librerías para generar PDF -->
+</div>
+    <script src="script.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    
-    <script src="script.js"></script>
 </body>
 </html>
