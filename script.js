@@ -7278,3 +7278,7 @@ function downloadReceiptAsPDF(saleId) {
     }
 }
 
+
+
+
+console.log('✅ Sistema de ventas cargado correctamente');
