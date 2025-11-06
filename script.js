@@ -23,7 +23,7 @@ const API_CONFIG = {
 
 // CONFIGURACIÓN FIREBASE
 const firebaseConfig = {
-    apiKey: "AIzaSyCNPAq_JrdikWJBLWR5QYzo-U0PhV4vvxA",
+    apiKey: "AIzaSyBBLtz9nTKg-twknr734lYJTLlyKw_IWQs",
     authDomain: "basededatos-b8f89.firebaseapp.com",
     databaseURL: "https://basededatos-b8f89-default-rtdb.firebaseio.com",
     projectId: "basededatos-b8f89",
@@ -7277,3 +7277,4 @@ function downloadReceiptAsPDF(saleId) {
         showAlert('❌ Error al generar el PDF', 'error');
     }
 }
+
