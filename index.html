@@ -109,272 +109,296 @@
 
             <div class="content-container">
                 <!-- Dashboard Section -->
-                <div id="dashboard-section" class="section">
-                    <!-- Estadísticas Principales (TUS 6 ESTADÍSTICAS ORIGINALES) -->
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-boxes"></i>
-                            </div>
-                            <div class="stat-info">
-                                <h3 id="total-products">0</h3>
-                                <p>Total Productos</p>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-money-bill-wave"></i>
-                            </div>
-                            <div class="stat-info">
-                                <h3 id="monthly-revenue">S/ 0.00</h3>
-                                <p>Ingresos Mensuales</p>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-users"></i>
-                            </div>
-                            <div class="stat-info">
-                                <h3 id="total-clients">0</h3>
-                                <p>Total Clientes</p>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-shipping-fast"></i>
-                            </div>
-                            <div class="stat-info">
-                                <h3 id="total-shipping">0</h3>
-                                <p>Total Envíos</p>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-shopping-cart"></i>
-                            </div>
-                            <div class="stat-info">
-                                <h3 id="total-sales">0</h3>
-                                <p>Total Ventas</p>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-clock"></i>
-                            </div>
-                            <div class="stat-info">
-                                <h3 id="pending-shipping">0</h3>
-                                <p>Envíos Pendientes</p>
-                            </div>
-                        </div>
-                    </div>
+                <!-- Dashboard Section -->
+<div id="dashboard-section" class="section">
+    <!-- Estadísticas Principales -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-boxes"></i>
+            </div>
+            <div class="stat-info">
+                <!-- CAMBIA: Agrega el id="total-products" -->
+                <h3 id="total-products">0</h3>
+                <p>Total Productos</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-money-bill-wave"></i>
+            </div>
+            <div class="stat-info">
+                <!-- CAMBIA: Agrega el id="monthly-revenue" -->
+                <h3 id="monthly-revenue">S/ 0.00</h3>
+                <p>Ingresos Mensuales</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-info">
+                <!-- CAMBIA: Agrega el id="total-clients" -->
+                <h3 id="total-clients">0</h3>
+                <p>Total Clientes</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-shipping-fast"></i>
+            </div>
+            <div class="stat-info">
+                <!-- CAMBIA: Agrega el id="total-shipping" -->
+                <h3 id="total-shipping">0</h3>
+                <p>Total Envíos</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-shopping-cart"></i>
+            </div>
+            <div class="stat-info">
+                <!-- CAMBIA: Agrega el id="total-sales" -->
+                <h3 id="total-sales">0</h3>
+                <p>Total Ventas</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-info">
+                <!-- CAMBIA: Agrega el id="pending-shipping" -->
+                <h3 id="pending-shipping">0</h3>
+                <p>Envíos Pendientes</p>
+            </div>
+        </div>
+    </div>
 
-                    <!-- NUEVAS ESTADÍSTICAS ADICIONALES (4 más) -->
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-icon" style="background: var(--warning-light); color: var(--warning);">
-                                <i class="fas fa-exclamation-triangle"></i>
-                            </div>
-                            <div class="stat-info">
-                                <h3 id="low-stock-products">0</h3>
-                                <p>Productos con Stock Bajo</p>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon" style="background: var(--success-light); color: var(--success);">
-                                <i class="fas fa-chart-line"></i>
-                            </div>
-                            <div class="stat-info">
-                                <h3 id="today-sales">0</h3>
-                                <p>Ventas del Día</p>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon" style="background: var(--info-light); color: var(--info);">
-                                <i class="fas fa-receipt"></i>
-                            </div>
-                            <div class="stat-info">
-                                <h3 id="average-ticket">S/ 0.00</h3>
-                                <p>Ticket Promedio</p>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon" style="background: var(--secondary-light); color: var(--secondary);">
-                                <i class="fas fa-percentage"></i>
-                            </div>
-                            <div class="stat-info">
-                                <h3 id="conversion-rate">0%</h3>
-                                <p>Conversión de Ventas</p>
-                            </div>
-                        </div>
-                    </div>
+    <!-- NUEVAS ESTADÍSTICAS ADICIONALES (4 más) -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon" style="background: var(--warning-light); color: var(--warning);">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="stat-info">
+                <!-- NUEVO: id para productos con stock bajo -->
+                <h3 id="low-stock-products">0</h3>
+                <p>Productos con Stock Bajo</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background: var(--success-light); color: var(--success);">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="stat-info">
+                <!-- NUEVO: id para ventas del día -->
+                <h3 id="today-sales">0</h3>
+                <p>Ventas del Día</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background: var(--info-light); color: var(--info);">
+                <i class="fas fa-receipt"></i>
+            </div>
+            <div class="stat-info">
+                <!-- NUEVO: id para ticket promedio -->
+                <h3 id="average-ticket">S/ 0.00</h3>
+                <p>Ticket Promedio</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background: var(--secondary-light); color: var(--secondary);">
+                <i class="fas fa-percentage"></i>
+            </div>
+            <div class="stat-info">
+                <!-- NUEVO: id para tasa de conversión -->
+                <h3 id="conversion-rate">0%</h3>
+                <p>Conversión de Ventas</p>
+            </div>
+        </div>
+    </div>
 
-                    <!-- GRÁFICOS DE RENDIMIENTO (NUEVOS) -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h3><i class="fas fa-chart-bar"></i> Rendimiento de Ventas</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="charts-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
-                                <div class="chart-container">
-                                    <h4>Ventas Mensuales</h4>
-                                    <canvas id="monthly-sales-chart" width="400" height="200"></canvas>
-                                </div>
-                                <div class="chart-container">
-                                    <h4>Productos Más Vendidos</h4>
-                                    <canvas id="top-products-chart" width="400" height="200"></canvas>
-                                </div>
-                                <div class="chart-container">
-                                    <h4>Métodos de Pago</h4>
-                                    <canvas id="payment-methods-chart" width="400" height="200"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+    <!-- GRÁFICOS DE RENDIMIENTO -->
+    <div class="card">
+        <div class="card-header">
+            <h3><i class="fas fa-chart-bar"></i> Rendimiento de Ventas</h3>
+        </div>
+        <div class="card-body">
+            <div class="charts-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                <div class="chart-container">
+                    <h4>Ventas Mensuales</h4>
+                    <canvas id="monthly-sales-chart" width="400" height="200"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h4>Productos Más Vendidos</h4>
+                    <canvas id="top-products-chart" width="400" height="200"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h4>Métodos de Pago</h4>
+                    <canvas id="payment-methods-chart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                    <!-- ACTIVIDAD RECIENTE (NUEVA) -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h3><i class="fas fa-history"></i> Actividad Reciente</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="activity-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                                <!-- Ventas Recientes -->
-                                <div>
-                                    <h4>Ventas Recientes</h4>
-                                    <div class="table-responsive">
-                                        <table>
-                                            <thead>
-                                                <tr>
-                                                    <th>ID</th>
-                                                    <th>Cliente</th>
-                                                    <th>Total</th>
-                                                    <th>Fecha</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="recent-sales-summary-body">
-                                                <tr>
-                                                    <td colspan="4" class="empty-state">
-                                                        <i class="fas fa-receipt"></i>
-                                                        <p>Cargando ventas...</p>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                                
-                                <!-- Productos Recientes -->
-                                <div>
-                                    <h4>Productos Agregados Recientemente</h4>
-                                    <div class="table-responsive">
-                                        <table>
-                                            <thead>
-                                                <tr>
-                                                    <th>Producto</th>
-                                                    <th>Categoría</th>
-                                                    <th>Precio</th>
-                                                    <th>Fecha</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="recent-products-body">
-                                                <tr>
-                                                    <td colspan="4" class="empty-state">
-                                                        <i class="fas fa-box"></i>
-                                                        <p>Cargando productos...</p>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- TUS SECCIONES ORIGINALES (SE MANTIENEN) -->
-                    
-                    <!-- Ventas Pendientes (TU SECCIÓN ORIGINAL) -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h3><i class="fas fa-clock"></i> Ventas Pendientes de Pago</h3>
-                        </div>
-                        <div class="card-body">
-                            <div id="pending-sales-list">
-                                <!-- Las ventas pendientes se cargarán aquí dinámicamente -->
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Alertas (TU SECCIÓN ORIGINAL) -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h3><i class="fas fa-exclamation-triangle"></i> Alertas de Stock</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="alert alert-warning">
-                                <i class="fas fa-exclamation-circle"></i>
-                                <strong>Productos con stock bajo: <span id="low-stock-alert">0</span></strong>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Ventas Recientes (TU SECCIÓN ORIGINAL) -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h3><i class="fas fa-history"></i> Ventas Recientes</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>ID</th>
-                                            <th>Cliente</th>
-                                            <th>Fecha</th>
-                                            <th>Total</th>
-                                            <th>Estado</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="recent-sales-body">
-                                        <tr>
-                                            <td colspan="5" class="empty-state">
-                                                <i class="fas fa-receipt"></i>
-                                                <p>Cargando ventas...</p>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Historial de Ventas (TU SECCIÓN ORIGINAL) -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h3><i class="fas fa-history"></i> Historial de Ventas</h3>
-                            <button class="btn btn-danger btn-sm" onclick="clearAllSalesHistory()">
-                                <i class="fas fa-trash-alt"></i> Limpiar Historial
-                            </button>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>ID</th>
-                                            <th>Cliente</th>
-                                            <th>Fecha</th>
-                                            <th>Total</th>
-                                            <th>Estado</th>
-                                            <th>Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="sales-history-body"></tbody>
-                                </table>
-                            </div>
-                        </div>
+    <!-- ACTIVIDAD RECIENTE -->
+    <div class="card">
+        <div class="card-header">
+            <h3><i class="fas fa-history"></i> Actividad Reciente</h3>
+        </div>
+        <div class="card-body">
+            <div class="activity-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <!-- Ventas Recientes -->
+                <div>
+                    <h4>Ventas Recientes</h4>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Cliente</th>
+                                    <th>Total</th>
+                                    <th>Fecha</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recent-sales-summary-body">
+                                <tr>
+                                    <td colspan="4" class="empty-state">
+                                        <i class="fas fa-receipt"></i>
+                                        <p>Cargando ventas...</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
+                
+                <!-- Productos Recientes -->
+                <div>
+                    <h4>Productos Agregados Recientemente</h4>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Categoría</th>
+                                    <th>Precio</th>
+                                    <th>Fecha</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recent-products-body">
+                                <tr>
+                                    <td colspan="4" class="empty-state">
+                                        <i class="fas fa-box"></i>
+                                        <p>Cargando productos...</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ventas Pendientes -->
+    <div class="card">
+        <div class="card-header">
+            <h3><i class="fas fa-clock"></i> Ventas Pendientes de Pago</h3>
+        </div>
+        <div class="card-body">
+            <div id="pending-sales-list">
+                <!-- Las ventas pendientes se cargarán aquí dinámicamente -->
+                <div class="empty-state">
+                    <i class="fas fa-clock"></i>
+                    <p>Cargando ventas pendientes...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alertas de Stock -->
+    <div class="card">
+        <div class="card-header">
+            <h3><i class="fas fa-exclamation-triangle"></i> Alertas de Stock</h3>
+        </div>
+        <div class="card-body">
+            <!-- NUEVO: Contenedor para alertas de stock -->
+            <div class="alert alert-warning" id="low-stock-alert-container">
+                <i class="fas fa-exclamation-circle"></i>
+                <strong>Productos con stock bajo: <span id="low-stock-alert">0</span></strong>
+            </div>
+            <div id="critical-alerts-container">
+                <!-- Alertas críticas se agregarán aquí -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Ventas Recientes -->
+    <div class="card">
+        <div class="card-header">
+            <h3><i class="fas fa-history"></i> Ventas Recientes</h3>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Cliente</th>
+                            <th>Fecha</th>
+                            <th>Total</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recent-sales-body">
+                        <tr>
+                            <td colspan="5" class="empty-state">
+                                <i class="fas fa-receipt"></i>
+                                <p>Cargando ventas...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Historial de Ventas -->
+    <div class="card">
+        <div class="card-header">
+            <h3><i class="fas fa-history"></i> Historial de Ventas</h3>
+            <button class="btn btn-danger btn-sm" onclick="clearAllSalesHistory()">
+                <i class="fas fa-trash-alt"></i> Limpiar Historial
+            </button>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Cliente</th>
+                            <th>Fecha</th>
+                            <th>Total</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sales-history-body">
+                        <tr>
+                            <td colspan="6" class="empty-state">
+                                <i class="fas fa-receipt"></i>
+                                <p>Cargando historial...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 
                 <!-- Products Section -->
                 <div id="products-section" class="section hidden">
@@ -615,12 +639,46 @@
                         </div>
                         <div class="card-body">
                             <form id="sale-form">
-                                <div class="form-group">
-                                    <label class="form-label">Cliente</label>
-                                    <select id="sale-client" class="form-control" required>
-                                        <option value="">Seleccione un cliente</option>
-                                    </select>
-                                </div>
+                                <div id="sale-client-container">
+    <div class="client-selector-enhanced">
+        <div class="client-selector-header">
+            <div class="client-selector-title">
+                <i class="fas fa-user-circle"></i>
+                <h4>Seleccionar Cliente</h4>
+            </div>
+            <div class="client-selected-indicator" style="display: none;">
+                <i class="fas fa-check-circle"></i>
+                <span>Cliente seleccionado</span>
+            </div>
+        </div>
+        
+        <select id="sale-client" class="form-control" required onchange="handleClientSelect()">
+            <option value="">Seleccione un cliente</option>
+            <!-- Las opciones se llenarán dinámicamente -->
+        </select>
+        
+        <div class="client-quick-actions">
+            <button type="button" class="quick-action-btn" onclick="showClientForm()">
+                <i class="fas fa-plus"></i> Nuevo Cliente
+            </button>
+            <button type="button" class="quick-action-btn" onclick="showAllClients()">
+                <i class="fas fa-list"></i> Ver Todos
+            </button>
+            <button type="button" class="quick-action-btn" onclick="showFrequentClients()">
+                <i class="fas fa-star"></i> Frecuentes
+            </button>
+        </div>
+        
+        <button type="button" class="toggle-client-info" onclick="toggleClientInfo()">
+            <i class="fas fa-chevron-down"></i>
+            <span>Ver información del cliente</span>
+        </button>
+    </div>
+    
+    <div class="client-info-expanded" id="client-info-expanded">
+        <!-- Aquí se mostrará la información detallada del cliente -->
+    </div>
+</div>
                             </form>
 
                             <!-- Selector Visual de Productos -->
@@ -1054,152 +1112,156 @@
                 </div>
 
                 <!-- Shipping Control Section -->
-                <div id="shipping-section" class="section hidden">
-                    <div class="section-header">
-                        <h2><i class="fas fa-shipping-fast"></i> Control de Envíos</h2>
-                        <div class="header-actions">
-                            <button class="btn btn-info" onclick="exportShippingReport()">
-                                <i class="fas fa-file-export"></i> Exportar
-                            </button>
-                            <button class="btn btn-primary" onclick="showShippingConfigModal()">
-                                <i class="fas fa-cog"></i> Configurar Ciudades
-                            </button>
-                        </div>
-                    </div>
+                <!-- Shipping Control Section -->
+<div id="shipping-section" class="section hidden">
+    <div class="section-header">
+        <h2><i class="fas fa-shipping-fast"></i> Control de Envíos</h2>
+        <div class="header-actions">
+            <button class="btn btn-info" onclick="exportShippingReport()">
+                <i class="fas fa-file-export"></i> Exportar
+            </button>
+            <button class="btn btn-primary" onclick="showShippingConfigModal()">
+                <i class="fas fa-cog"></i> Configurar Ciudades
+            </button>
+        </div>
+    </div>
 
-                    <!-- Estadísticas de Envíos -->
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-icon shipping-pending-icon">
-                                <i class="fas fa-clock"></i>
-                            </div>
-                            <div class="stat-info">
-                                <h3 id="total-pending-shipping">0</h3>
-                                <p>Envíos Pendientes</p>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon shipping-transit-icon">
-                                <i class="fas fa-truck"></i>
-                            </div>
-                            <div class="stat-info">
-                                <h3 id="total-in-transit">0</h3>
-                                <p>En Tránsito</p>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon shipping-delivered-icon">
-                                <i class="fas fa-check-circle"></i>
-                            </div>
-                            <div class="stat-info">
-                                <h3 id="total-delivered">0</h3>
-                                <p>Entregados</p>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon shipping-cities-icon">
-                                <i class="fas fa-map-marker-alt"></i>
-                            </div>
-                            <div class="stat-info">
-                                <h3 id="total-cities">0</h3>
-                                <p>Ciudades Activas</p>
-                            </div>
-                        </div>
-                    </div>
+    <!-- Estadísticas de Envíos -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon shipping-pending-icon">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-info">
+                <h3 id="total-pending-shipping">0</h3>
+                <p>Envíos Pendientes</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon shipping-transit-icon">
+                <i class="fas fa-truck"></i>
+            </div>
+            <div class="stat-info">
+                <h3 id="total-in-transit">0</h3>
+                <p>En Tránsito</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon shipping-delivered-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-info">
+                <h3 id="total-delivered">0</h3>
+                <p>Entregados</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon shipping-cities-icon">
+                <i class="fas fa-map-marker-alt"></i>
+            </div>
+            <div class="stat-info">
+                <h3 id="total-cities">0</h3>
+                <p>Ciudades Activas</p>
+            </div>
+        </div>
+    </div>
 
-                    <!-- Filtros Rápidos -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h3><i class="fas fa-filter"></i> Filtros Rápidos</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="shipping-filters">
-                                <div class="filter-buttons">
-                                    <button class="btn btn-outline-primary active" onclick="filterShipping('all')">
-                                        Todos (<span id="count-all">0</span>)
-                                    </button>
-                                    <button class="btn btn-outline-warning" onclick="filterShipping('pending')">
-                                        Pendientes (<span id="count-pending">0</span>)
-                                    </button>
-                                    <button class="btn btn-outline-info" onclick="filterShipping('transit')">
-                                        En Tránsito (<span id="count-transit">0</span>)
-                                    </button>
-                                    <button class="btn btn-outline-success" onclick="filterShipping('delivered')">
-                                        Entregados (<span id="count-delivered">0</span>)
-                                    </button>
-                                    <button class="btn btn-outline-danger" onclick="filterShipping('cancelled')">
-                                        Cancelados (<span id="count-cancelled">0</span>)
-                                    </button>
-                                </div>
-                                
-                                <div class="filter-advanced">
-                                    <div class="form-group">
-                                        <label class="form-label">Buscar por código o cliente:</label>
-                                        <input type="text" id="shipping-search" class="form-control" 
-                                               placeholder="🔍 Código, cliente, ciudad..." oninput="searchShipping()">
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">Ciudad:</label>
-                                        <select id="shipping-city-filter" class="form-control" onchange="filterByCity()">
-                                            <option value="all">Todas las ciudades</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+    <!-- Filtros Rápidos -->
+    <div class="card">
+        <div class="card-header">
+            <h3><i class="fas fa-filter"></i> Filtros Rápidos</h3>
+        </div>
+        <div class="card-body">
+            <div class="shipping-filters">
+                <div class="filter-buttons">
+                    <button class="btn btn-outline-primary active" onclick="filterShipping('all')">
+                        Todos (<span id="count-all">0</span>)
+                    </button>
+                    <button class="btn btn-outline-warning" onclick="filterShipping('pending')">
+                        Pendientes (<span id="count-pending">0</span>)
+                    </button>
+                    <button class="btn btn-outline-info" onclick="filterShipping('transit')">
+                        En Tránsito (<span id="count-transit">0</span>)
+                    </button>
+                    <button class="btn btn-outline-success" onclick="filterShipping('delivered')">
+                        Entregados (<span id="count-delivered">0</span>)
+                    </button>
+                    <button class="btn btn-outline-danger" onclick="filterShipping('cancelled')">
+                        Cancelados (<span id="count-cancelled">0</span>)
+                    </button>
+                </div>
+                
+                <div class="filter-advanced">
+                    <div class="form-group">
+                        <label class="form-label">Buscar por código o cliente:</label>
+                        <input type="text" id="shipping-search" class="form-control" 
+                               placeholder="🔍 Código, cliente, ciudad..." oninput="searchShipping()">
                     </div>
-
-                    <!-- Lista de Envíos -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h3><i class="fas fa-list"></i> Control de Envíos</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th style="width: 20%;">Cliente</th>
-                                            <th style="width: 15%;">Ciudad</th>
-                                            <th style="width: 20%;">Dirección</th>
-                                            <th style="width: 10%;">Fecha</th>
-                                            <th style="width: 15%;">Código</th>
-                                            <th style="width: 10%;">Estado</th>
-                                            <th style="width: 20%;">Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="shipping-table-body">
-                                        <tr>
-                                            <td colspan="7" class="empty-state">
-                                                <i class="fas fa-shipping-fast"></i>
-                                                <p>No hay envíos registrados</p>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Mapa de Envíos (Opcional) -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h3><i class="fas fa-map"></i> Distribución de Envíos por Ciudad</h3>
-                        </div>
-                        <div class="card-body">
-                            <div id="shipping-map" class="shipping-map">
-                                <div class="map-placeholder">
-                                    <i class="fas fa-map-marked-alt"></i>
-                                    <p>Mapa de distribución de envíos</p>
-                                    <small>Aquí se mostraría un mapa con los envíos por ciudad</small>
-                                </div>
-                            </div>
-                            <div class="cities-distribution" id="cities-distribution">
-                                <!-- La distribución por ciudades se cargará aquí -->
-                            </div>
-                        </div>
+                    <div class="form-group">
+                        <label class="form-label">Ciudad:</label>
+                        <select id="shipping-city-filter" class="form-control" onchange="filterByCity()">
+                            <option value="all">Todas las ciudades</option>
+                        </select>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Envíos -->
+    <div class="card">
+        <div class="card-header">
+            <h3><i class="fas fa-list"></i> Control de Envíos</h3>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="shipping-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 8%;">ID Venta</th>
+                            <th style="width: 20%;">Cliente</th>
+                            <th style="width: 12%;">Productos</th>
+                            <th style="width: 15%;">Ciudad</th>
+                            <th style="width: 15%;">Dirección</th>
+                            <th style="width: 8%;">Fecha</th>
+                            <th style="width: 10%;">Código</th>
+                            <th style="width: 8%;">Estado</th>
+                            <th style="width: 14%;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="shipping-table-body">
+                        <!-- Los datos se cargarán dinámicamente aquí -->
+                        <tr>
+                            <td colspan="9" class="empty-state">
+                                <i class="fas fa-shipping-fast"></i>
+                                <p>Cargando envíos...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mapa de Envíos (Opcional) -->
+    <div class="card">
+        <div class="card-header">
+            <h3><i class="fas fa-map"></i> Distribución de Envíos por Ciudad</h3>
+        </div>
+        <div class="card-body">
+            <div id="shipping-map" class="shipping-map">
+                <div class="map-placeholder">
+                    <i class="fas fa-map-marked-alt"></i>
+                    <p>Mapa de distribución de envíos</p>
+                    <small>Aquí se mostraría un mapa con los envíos por ciudad</small>
+                </div>
+            </div>
+            <div class="cities-distribution" id="cities-distribution">
+                <!-- La distribución por ciudades se cargará aquí -->
+            </div>
+        </div>
+    </div>
+</div>
 
                 <!-- Clients Section -->
                 <div id="clients-section" class="section hidden">
