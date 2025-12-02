@@ -1525,6 +1525,415 @@ tbody tr:last-child td {
     flex-wrap: wrap;
 }
 
+/* ============================================
+   SECCIÓN DE CLIENTE - MEJORA ESPECÍFICA PARA EL HTML ACTUAL
+   ============================================ */
+
+/* Contenedor principal mejorado */
+#sale-client-container {
+    position: relative;
+    margin-bottom: 24px;
+}
+
+/* Selector de cliente mejorado */
+.client-selector-enhanced {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 10px 30px rgba(52, 152, 219, 0.3);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+}
+
+.client-selector-enhanced:hover {
+    box-shadow: 0 15px 40px rgba(52, 152, 219, 0.4);
+    transform: translateY(-2px);
+}
+
+/* Efecto de fondo */
+.client-selector-enhanced::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: rotate 20s linear infinite;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Header de la sección */
+.client-selector-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 1;
+}
+
+.client-selector-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.client-selector-title h4 {
+    margin: 0;
+    color: white;
+    font-size: 1.4em;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.client-selector-title i {
+    color: white;
+    font-size: 1.6em;
+    animation: pulse-icon 2s infinite;
+}
+
+@keyframes pulse-icon {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+/* Select de cliente mejorado */
+#sale-client {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    padding: 16px 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    font-size: 16px;
+    background: rgba(255, 255, 255, 0.95);
+    color: var(--gray-900);
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23667eea' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 20px center;
+    background-size: 16px;
+    cursor: pointer;
+}
+
+#sale-client:focus {
+    outline: none;
+    border-color: white;
+    background: white;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    transform: translateY(-2px);
+}
+
+#sale-client option {
+    padding: 12px;
+    font-size: 14px;
+}
+
+/* Estado del selector vacío */
+.client-selector-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: rgba(255, 255, 255, 0.8);
+    position: relative;
+    z-index: 1;
+}
+
+.client-selector-empty i {
+    font-size: 3em;
+    margin-bottom: 16px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.client-selector-empty p {
+    margin: 0;
+    font-size: 1.1em;
+    font-weight: 500;
+}
+
+.client-selector-empty .suggestion {
+    margin-top: 12px;
+    font-size: 0.9em;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Acciones rápidas para cliente */
+.client-quick-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+}
+
+.quick-action-btn {
+    flex: 1;
+    min-width: 150px;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    color: var(--gray-900);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-align: center;
+    backdrop-filter: blur(10px);
+    position: relative;
+    z-index: 1;
+}
+
+.quick-action-btn:hover {
+    background: white;
+    border-color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+.quick-action-btn i {
+    font-size: 1.2em;
+    color: var(--primary);
+}
+
+/* Indicador de cliente seleccionado */
+.client-selected-indicator {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(39, 174, 96, 0.9);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    font-weight: 600;
+    z-index: 2;
+    backdrop-filter: blur(10px);
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-50%) translateX(20px); }
+    to { opacity: 1; transform: translateY(-50%) translateX(0); }
+}
+
+.client-selected-indicator i {
+    font-size: 0.9em;
+}
+
+/* Estados del select cuando hay cliente seleccionado */
+#sale-client:not([value=""]) {
+    background: rgba(255, 255, 255, 0.98);
+    border-color: var(--success);
+    padding-right: 100px;
+}
+
+#sale-client:not([value=""]) + .client-selected-indicator {
+    display: flex;
+}
+
+/* Efecto de éxito al seleccionar */
+.client-selected-success {
+    animation: successPulse 1s ease;
+}
+
+@keyframes successPulse {
+    0% { box-shadow: 0 10px 30px rgba(52, 152, 219, 0.3); }
+    50% { box-shadow: 0 10px 30px rgba(39, 174, 96, 0.5); }
+    100% { box-shadow: 0 10px 30px rgba(52, 152, 219, 0.3); }
+}
+
+/* Información del cliente seleccionado (opcional - se puede expandir) */
+.client-info-expanded {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    margin-top: 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    animation: slideInUp 0.4s ease;
+    display: none;
+}
+
+.client-info-expanded.show {
+    display: block;
+}
+
+.client-info-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.client-avatar {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 1.2em;
+    flex-shrink: 0;
+}
+
+.client-details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.client-detail-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: var(--gray-50);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.client-detail-item:hover {
+    background: var(--gray-100);
+    transform: translateY(-2px);
+}
+
+.client-detail-icon {
+    width: 24px;
+    height: 24px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 12px;
+    flex-shrink: 0;
+}
+
+.client-detail-text {
+    flex: 1;
+}
+
+.client-detail-label {
+    font-size: 11px;
+    color: var(--gray-600);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+}
+
+.client-detail-value {
+    font-weight: 600;
+    color: var(--gray-900);
+    font-size: 13px;
+}
+
+/* Botón para expandir/contraer información del cliente */
+.toggle-client-info {
+    background: none;
+    border: none;
+    color: var(--primary);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+    position: relative;
+    z-index: 1;
+}
+
+.toggle-client-info:hover {
+    background: var(--gray-100);
+    color: var(--primary-dark);
+}
+
+.toggle-client-info i {
+    transition: transform 0.3s ease;
+}
+
+.toggle-client-info.expanded i {
+    transform: rotate(180deg);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .client-selector-enhanced {
+        padding: 20px;
+        border-radius: 12px;
+    }
+    
+    .client-selector-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    
+    .quick-action-btn {
+        min-width: 100%;
+    }
+    
+    .client-details-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    #sale-client {
+        padding: 14px 16px;
+        font-size: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .client-selector-enhanced {
+        padding: 16px;
+    }
+    
+    .client-selector-title h4 {
+        font-size: 1.2em;
+    }
+    
+    .client-quick-actions {
+        flex-direction: column;
+    }
+    
+    .client-selected-indicator {
+        position: static;
+        transform: none;
+        margin-top: 10px;
+        width: 100%;
+        justify-content: center;
+    }
+    
+    #sale-client:not([value=""]) {
+        padding-right: 16px;
+    }
+}
+
+
 /* Búsqueda de Cliente Mejorada */
 .client-search-section {
     background: var(--gray-50);
@@ -7124,3 +7533,259 @@ select:disabled {
     background: #fff3cd;
     color: #856404;
 }
+
+/* Estilos para imágenes en la tabla de inventario */
+.product-info-small {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.product-image-cell-small {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 4px;
+    border: 1px solid #e0e0e0;
+    flex-shrink: 0;
+}
+
+.product-table-image-small {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.product-table-icon-small {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f5f5f5;
+    color: #666;
+    font-size: 16px;
+}
+
+.product-text-info {
+    flex: 1;
+}
+
+.product-text-info strong {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 2px;
+}
+
+.product-text-info small {
+    color: #666;
+    font-size: 11px;
+}
+
+/* Ajustar las columnas de la tabla de inventario */
+#inventory-table-body td:first-child {
+    min-width: 200px;
+}
+
+/* Asegurar que la columna de imagen tenga tamaño consistente */
+.inventory-table th:first-child,
+.inventory-table td:first-child {
+    width: 200px;
+}
+
+/* Estilos para imágenes en ventas pendientes */
+.products-preview-with-images {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-width: 250px;
+}
+
+.product-mini-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+    border-bottom: 1px dashed #eee;
+}
+
+.product-mini-item:last-child {
+    border-bottom: none;
+}
+
+.product-mini-image-container {
+    width: 80px;
+    height: 80px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.product-mini-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid #e0e0e0;
+    background: #f8f9fa;
+}
+
+.product-mini-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 4px;
+    background: #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+    font-size: 12px;
+    border: 1px solid #dee2e6;
+}
+
+.product-mini-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow: hidden;
+}
+
+.product-mini-name {
+    font-size: 11px;
+    font-weight: 500;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.product-mini-quantity {
+    font-size: 10px;
+    color: #666;
+    font-weight: normal;
+}
+
+.more-products {
+    font-size: 10px;
+    color: #007bff;
+    background: #e3f2fd;
+    padding: 2px 6px;
+    border-radius: 10px;
+    display: inline-block;
+    margin-top: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.more-products:hover {
+    background: #d0e9ff;
+    color: #0056b3;
+}
+
+/* Estilos para hover y detalles */
+.product-mini-item:hover {
+    background: #f8f9fa;
+    border-radius: 4px;
+    padding: 4px;
+}
+
+/* Estilo para imágenes más grandes en modal de gestión */
+.modal .product-mini-image {
+    width: 40px;
+    height: 40px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .products-preview-with-images {
+        max-width: 150px;
+    }
+    
+    .product-mini-item {
+        flex-direction: column;
+        text-align: center;
+        gap: 4px;
+    }
+    
+    .product-mini-info {
+        width: 100%;
+        align-items: center;
+    }
+}
+
+
+
+
+/* Estilos para imágenes en la tabla de envíos */
+.shipping-products-summary {
+    max-width: 200px;
+}
+
+.shipping-products-images {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.shipping-product-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 5px;
+    padding: 3px;
+    background: #f8f9fa;
+    border-radius: 4px;
+}
+
+.shipping-product-image-container {
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.shipping-product-image {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 3px;
+    border: 1px solid #dee2e6;
+}
+
+.shipping-product-icon {
+    width: 30px;
+    height: 30px;
+    background: #e9ecef;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+}
+
+.shipping-product-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.shipping-product-name {
+    font-size: 11px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
+}
+
+.shipping-product-quantity {
+    font-size: 10px;
+    color: #6c757d;
+}
+
+
