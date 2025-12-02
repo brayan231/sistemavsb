@@ -1793,13 +1793,27 @@ async function completeSale() {
     
     try {
         const clients = await getClients();
-        const products = await getProducts();
+        const products = await getProducts(); // Obtener productos actualizados
         const sales = await getSales();
         
         const client = clients.find(c => c.id === clientId);
         if (!client) {
             showAlert('❌ Cliente no encontrado', 'error');
             return;
+        }
+        
+        // Verificar stock antes de proceder
+        for (const saleItem of currentSaleItems) {
+            const product = products.find(p => p.id === saleItem.productId);
+            if (!product) {
+                showAlert(`❌ Producto ${saleItem.name} no encontrado`, 'error');
+                return;
+            }
+            
+            if (product.stock < saleItem.quantity) {
+                showAlert(`❌ Stock insuficiente para ${product.name}. Disponible: ${product.stock}, Solicitado: ${saleItem.quantity}`, 'error');
+                return;
+            }
         }
         
         // CALCULAR SUBTOTAL Y DESCUENTO
@@ -1820,7 +1834,7 @@ async function completeSale() {
         
         const total = subtotal - discountAmount;
         
-        // **SIEMPRE ACTUALIZAR EL STOCK** - los productos se venden/separan
+        // ACTUALIZAR EL STOCK DE FORMA PERMANENTE
         await updateStockForSale(currentSaleItems, products);
         
         // Preparar datos de la venta
@@ -1833,9 +1847,7 @@ async function completeSale() {
                 name: item.name,
                 price: item.price,
                 quantity: item.quantity,
-                total: item.price * item.quantity,
-                priceWithDiscount: currentDiscount ? 
-                    item.price * (1 - (discountPercentage / 100)) : item.price
+                total: item.price * item.quantity
             })),
             subtotal: subtotal,
             discount: currentDiscount ? {
@@ -1922,16 +1934,19 @@ async function completeSale() {
             saleData.pendingAmount = 0;
         }
         
-        sales.push(saleData);
+         sales.push(saleData);
         await saveSales(sales);
         
+        // Limpiar y actualizar
         await showSaleReceipt(saleData.id);
         clearCurrentSale();
         loadSalesHistory();
         loadRecentSales();
         updateDashboardStats();
+        loadProductsTable(); // ¡ACTUALIZAR LA TABLA DE PRODUCTOS!
+        loadProductsGrid(); // ¡ACTUALIZAR LA VISTA DE PRODUCTOS!
         
-        showAlert('✅ Venta registrada correctamente', 'success');
+        showAlert('✅ Venta registrada y stock actualizado correctamente', 'success');
         
     } catch (error) {
         console.error('❌ Error al finalizar venta:', error);
@@ -1957,7 +1972,9 @@ async function updateStockForSale(saleItems, products) {
         return product;
     });
     
+    // ¡IMPORTANTE! Guardar los cambios en Firebase
     await saveProducts(updatedProducts);
+    return updatedProducts;
 }
 
 
@@ -2604,33 +2621,129 @@ async function loadSalesHistory() {
 }
 
 async function loadRecentSales() {
-    const sales = await getSales();
-    const clients = await getClients();
-    const tbody = document.getElementById('recent-sales-body');
-    if (!tbody) return;
-    
-    tbody.innerHTML = '';
-    
-    if (sales.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><i class="fas fa-receipt"></i><p>No hay ventas recientes</p></td></tr>';
-        return;
-    }
-    
-    sales.slice(-5).reverse().forEach(sale => {
-        const client = clients.find(c => c.id === sale.clientId);
-        const statusClass = sale.status === 'Pagado' ? 'badge-success' : 
-                          sale.status === 'Separado' ? 'badge-warning' : 'badge-danger';
+    try {
+        const sales = await getSales();
+        const clients = await getClients();
+        const products = await getProducts();
+        const tbody = document.getElementById('recent-sales-body');
         
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>#${sale.id.toString().padStart(4, '0')}</td>
-            <td>${client ? client.name : 'N/A'}</td>
-            <td>${sale.date}</td>
-            <td>S/${sale.total.toFixed(2)}</td>
-            <td><span class="badge ${statusClass}">${sale.status}</span></td>
-        `;
-        tbody.appendChild(row);
-    });
+        if (!tbody) return;
+        
+        // LIMPIAR TABLA COMPLETAMENTE
+        tbody.innerHTML = '';
+        
+        if (sales.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><i class="fas fa-receipt"></i><p>No hay ventas recientes</p></td></tr>';
+            return;
+        }
+        
+        // ORDEN DESCENDENTE: ID más grande (más reciente) PRIMERO
+        const sortedSales = [...sales].sort((a, b) => b.id - a.id);
+        
+        // Tomar las 10 más recientes (IDs más grandes)
+        const recentSales = sortedSales.slice(0, 10);
+        
+        console.log('VENTAS ORDENADAS DESCENDENTE (más reciente primero):');
+        recentSales.forEach((sale, index) => {
+            console.log(`${index + 1}. Venta #${sale.id} - Fecha: ${sale.date} ${sale.time || ''}`);
+        });
+        
+        // AGREGAR VENTAS A LA TABLA en orden descendente
+        recentSales.forEach(sale => {
+            const client = clients.find(c => c.id === sale.clientId);
+            const statusClass = sale.status === 'Pagado' ? 'badge-success' : 
+                              sale.status === 'Separado' ? 'badge-warning' : 'badge-danger';
+            
+            // Obtener información del primer producto CON IMAGEN
+            const firstProduct = sale.items && sale.items.length > 0 ? sale.items[0] : null;
+            let productImageHTML = '';
+            let productName = 'N/A';
+            let productQuantity = 0;
+            
+            if (firstProduct) {
+                productName = firstProduct.name;
+                productQuantity = firstProduct.quantity;
+                
+                // Buscar el producto para obtener la imagen
+                const product = products.find(p => p.id === firstProduct.productId);
+                
+                // HTML CON IMAGEN DEL PRODUCTO
+                productImageHTML = `
+                    <div class="product-cell">
+                        <div class="product-image-container">
+                            ${product && product.image ? 
+                                `<img src="${product.image}" alt="${product.name}" class="product-img-medium" onerror="this.style.display='none'">` : 
+                                `<div class="product-img-placeholder-medium">
+                                    <i class="fas fa-box"></i>
+                                </div>`
+                            }
+                        </div>
+                        <div class="product-details-compact">
+                            <div class="product-name-truncate">${productName}</div>
+                            <div class="product-info-small">
+                                ${firstProduct.price > 0 ? `<span>S/ ${firstProduct.price.toFixed(2)} c/u</span>` : ''}
+                                ${sale.items.length > 1 ? `<span class="more-products">+${sale.items.length - 1} más</span>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                productImageHTML = `
+                    <div class="product-cell">
+                        <div class="product-image-container">
+                            <div class="product-img-placeholder-medium">
+                                <i class="fas fa-question-circle"></i>
+                            </div>
+                        </div>
+                        <div class="product-details-compact">
+                            <div class="product-name-truncate">Producto no disponible</div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Crear la fila COMPLETA con todas las columnas
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td class="sale-id">
+                    <strong>#${sale.id.toString().padStart(4, '0')}</strong>
+                </td>
+                <td class="product-column">
+                    ${productImageHTML}
+                </td>
+                <td class="client-column">
+                    <div class="client-info-compact">
+                        <strong>${client ? client.name : 'N/A'}</strong>
+                        ${client && client.phone ? `<br><small class="text-muted">${client.phone}</small>` : ''}
+                    </div>
+                </td>
+                <td class="quantity-column">
+                    <span class="quantity-badge">${productQuantity}</span>
+                </td>
+                <td class="date-column">
+                    ${sale.date}
+                    ${sale.time ? `<br><small class="text-muted">${sale.time}</small>` : ''}
+                </td>
+                <td class="total-column">
+                    <strong>S/ ${sale.total.toFixed(2)}</strong>
+                </td>
+                <td class="status-column">
+                    <span class="badge ${statusClass}">${sale.status}</span>
+                </td>
+            `;
+            
+            // AGREGAR AL FINAL DE LA TABLA (orden descendente)
+            tbody.appendChild(row);
+        });
+        
+        console.log(`✅ ${recentSales.length} ventas cargadas.`);
+        console.log(`   PRIMERA FILA: Venta #${recentSales[0]?.id} (MÁS RECIENTE)`);
+        console.log(`   ÚLTIMA FILA: Venta #${recentSales[recentSales.length-1]?.id} (MENOS RECIENTE)`);
+        
+    } catch (error) {
+        console.error('❌ Error en loadRecentSales:', error);
+        showAlert('Error al cargar ventas recientes', 'error');
+    }
 }
 
 async function deleteSale(saleId) {
