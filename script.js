@@ -184,6 +184,9 @@ document.addEventListener('DOMContentLoaded', function() {
         setupModalEvents();
         setupImagePreview();
         initializeReportDates();
+        loadRecentSalesSummary();
+        // Removido: loadRecentProducts() - no existe
+        updateCriticalAlerts();
         return loadInitialData();
     }).then(() => {
         console.log('✅ Sistema inicializado correctamente');
@@ -193,6 +196,8 @@ document.addEventListener('DOMContentLoaded', function() {
         showAlert('Error al inicializar el sistema: ' + error.message, 'error');
     });
 });
+
+
 // Inicializar gráficos del dashboard
 function initializeDashboardCharts() {
   // Gráfico de ventas mensuales
@@ -1447,17 +1452,61 @@ function updateSelectedProducts(index) {
 }
 
 function updateSelectedTotal() {
-    let selectedTotal = 0;
+    // Calcular subtotal de productos seleccionados
+    let selectedSubtotal = 0;
     
     selectedProducts.forEach(index => {
         const item = currentSaleItems[index];
-        selectedTotal += item.price * item.quantity;
+        selectedSubtotal += item.price * item.quantity;
     });
     
+    // Aplicar descuento proporcionalmente
+    let selectedDiscountAmount = 0;
+    
+    if (currentDiscount) {
+        const totalSubtotal = currentSaleItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        
+        if (currentDiscount.type === 'percentage') {
+            selectedDiscountAmount = selectedSubtotal * (currentDiscount.amount / 100);
+        } else {
+            // Calcular proporción del descuento
+            const discountProportion = selectedSubtotal / totalSubtotal;
+            selectedDiscountAmount = currentDiscount.value * discountProportion;
+        }
+    }
+    
+    const selectedTotal = selectedSubtotal - selectedDiscountAmount;
+    
+    // Mostrar información detallada
     document.getElementById('selected-total').textContent = selectedTotal.toFixed(2);
     document.getElementById('payment-amount').value = selectedTotal.toFixed(2);
+    
+    // Mostrar detalles del descuento aplicado
+    const discountInfo = document.getElementById('discount-info');
+    if (!discountInfo) {
+        const container = document.getElementById('partial-payment-section');
+        if (container) {
+            container.insertAdjacentHTML('beforeend', `
+                <div class="discount-info alert alert-info" id="discount-info" style="margin-top: 10px; padding: 8px; font-size: 12px;">
+                    <i class="fas fa-tag"></i> Descuento aplicado: S/ <span id="selected-discount-amount">0.00</span>
+                </div>
+            `);
+        }
+    }
+    
+    if (currentDiscount && selectedDiscountAmount > 0) {
+        document.getElementById('selected-discount-amount').textContent = selectedDiscountAmount.toFixed(2);
+        document.getElementById('discount-info').style.display = 'block';
+    } else {
+        const discountInfoEl = document.getElementById('discount-info');
+        if (discountInfoEl) {
+            discountInfoEl.style.display = 'none';
+        }
+    }
+    
     calculateRemaining();
 }
+
 
 function calculateRemaining() {
     const selectedTotalText = document.getElementById('selected-total').textContent;
@@ -1473,6 +1522,7 @@ function calculateRemaining() {
     document.getElementById('change-amount').textContent = change.toFixed(2);
     document.getElementById('pending-amount').textContent = pending.toFixed(2);
 }
+
 
 function calculateChange() {
     const totalText = document.getElementById('sale-total').textContent;
@@ -1752,20 +1802,28 @@ async function completeSale() {
             return;
         }
         
+        // CALCULAR SUBTOTAL Y DESCUENTO
         let subtotal = currentSaleItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
         let discountAmount = 0;
+        let discountPercentage = 0;
         
         if (currentDiscount) {
             if (currentDiscount.type === 'percentage') {
+                discountPercentage = currentDiscount.amount;
                 discountAmount = subtotal * (currentDiscount.amount / 100);
             } else {
                 discountAmount = currentDiscount.amount;
+                discountPercentage = (discountAmount / subtotal) * 100;
             }
             discountAmount = Math.min(discountAmount, subtotal);
         }
         
         const total = subtotal - discountAmount;
         
+        // **SIEMPRE ACTUALIZAR EL STOCK** - los productos se venden/separan
+        await updateStockForSale(currentSaleItems, products);
+        
+        // Preparar datos de la venta
         const saleData = {
             id: sales.length > 0 ? Math.max(...sales.map(s => s.id)) + 1 : 1,
             clientId: clientId,
@@ -1775,19 +1833,22 @@ async function completeSale() {
                 name: item.name,
                 price: item.price,
                 quantity: item.quantity,
-                total: item.price * item.quantity
+                total: item.price * item.quantity,
+                priceWithDiscount: currentDiscount ? 
+                    item.price * (1 - (discountPercentage / 100)) : item.price
             })),
             subtotal: subtotal,
             discount: currentDiscount ? {
                 type: currentDiscount.type,
                 amount: currentDiscount.amount,
                 value: discountAmount,
-                reason: currentDiscount.reason
+                reason: currentDiscount.reason,
+                percentage: discountPercentage
             } : null,
             total: total,
             date: new Date().toLocaleDateString('es-PE'),
+            time: new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' }),
             paymentMethod: selectedPaymentMethod,
-            // Información de envío simplificada
             requiresShipping: requiresShipping,
             shippingStatus: requiresShipping ? 'pending' : 'not_required',
             shippingCode: requiresShipping ? generateProductBasedCode(currentSaleItems, products) : null,
@@ -1798,11 +1859,25 @@ async function completeSale() {
         };
         
         if (isPartialPayment && selectedProducts.length > 0) {
-            const selectedTotal = selectedProducts.reduce((sum, index) => {
+            // CALCULAR EL TOTAL SELECCIONADO CON DESCUENTO PROPORCIONAL
+            const selectedSubtotal = selectedProducts.reduce((sum, index) => {
                 const item = currentSaleItems[index];
                 return sum + (item.price * item.quantity);
             }, 0);
             
+            // Aplicar el descuento proporcionalmente al subtotal seleccionado
+            let selectedDiscountAmount = 0;
+            if (currentDiscount) {
+                if (currentDiscount.type === 'percentage') {
+                    selectedDiscountAmount = selectedSubtotal * (currentDiscount.amount / 100);
+                } else {
+                    // Calcular el porcentaje del descuento sobre el total seleccionado
+                    const discountProportion = selectedSubtotal / subtotal;
+                    selectedDiscountAmount = discountAmount * discountProportion;
+                }
+            }
+            
+            const selectedTotal = selectedSubtotal - selectedDiscountAmount;
             const paymentAmount = parseFloat(document.getElementById('payment-amount').value) || 0;
             const paidAmount = Math.min(paymentAmount, selectedTotal);
             const pendingAmount = selectedTotal - paidAmount;
@@ -1812,11 +1887,26 @@ async function completeSale() {
                 return;
             }
             
+            // Calcular el descuento restante para productos no seleccionados
+            const remainingSubtotal = subtotal - selectedSubtotal;
+            let remainingDiscountAmount = 0;
+            if (currentDiscount) {
+                if (currentDiscount.type === 'percentage') {
+                    remainingDiscountAmount = remainingSubtotal * (currentDiscount.amount / 100);
+                } else {
+                    const discountProportion = remainingSubtotal / subtotal;
+                    remainingDiscountAmount = discountAmount * discountProportion;
+                }
+            }
+            
             saleData.isPartialPayment = true;
             saleData.status = 'Separado';
             saleData.paidAmount = paidAmount;
-            saleData.pendingAmount = pendingAmount;
+            saleData.pendingAmount = pendingAmount + remainingDiscountAmount;
             saleData.selectedProducts = selectedProducts.map(index => currentSaleItems[index].productId);
+            saleData.selectedTotal = selectedTotal;
+            saleData.selectedDiscount = selectedDiscountAmount;
+            saleData.remainingDiscount = remainingDiscountAmount;
             
         } else {
             const amountReceived = parseFloat(document.getElementById('amount-received').value) || total;
@@ -1830,8 +1920,6 @@ async function completeSale() {
             saleData.status = 'Pagado';
             saleData.paidAmount = total;
             saleData.pendingAmount = 0;
-            
-            await updateStockForSale(currentSaleItems, products);
         }
         
         sales.push(saleData);
@@ -1851,13 +1939,19 @@ async function completeSale() {
     }
 }
 
+
+
 async function updateStockForSale(saleItems, products) {
     const updatedProducts = products.map(product => {
         const saleItem = saleItems.find(item => item.productId === product.id);
         if (saleItem) {
+            const newStock = product.stock - saleItem.quantity;
+            if (newStock < 0) {
+                throw new Error(`Stock insuficiente para ${product.name}. Stock actual: ${product.stock}, solicitado: ${saleItem.quantity}`);
+            }
             return {
                 ...product,
-                stock: product.stock - saleItem.quantity
+                stock: newStock
             };
         }
         return product;
@@ -1865,6 +1959,8 @@ async function updateStockForSale(saleItems, products) {
     
     await saveProducts(updatedProducts);
 }
+
+
 
 function clearCurrentSale() {
     currentSaleItems = [];
@@ -1919,66 +2015,495 @@ document.addEventListener('DOMContentLoaded', function() {
 // === FUNCIONES DEL DASHBOARD ===
 async function updateDashboardStats() {
     try {
+        console.log('📊 Actualizando dashboard...');
         const products = await getProducts();
         const clients = await getClients();
         const sales = await getSales();
         
+        // 1. Calcular total de productos
         const totalProducts = products.length;
-        const totalClients = clients.length;
-        const totalSales = sales.length;
+        document.getElementById('total-products').textContent = totalProducts;
         
-        const currentMonth = new Date().getMonth();
-        const currentYear = new Date().getFullYear();
+        // 2. Calcular ingresos mensuales (CORREGIDO)
+        const now = new Date();
+        const currentMonth = now.getMonth(); // 0-11
+        const currentYear = now.getFullYear();
         
-        const monthlyRevenue = sales
-            .filter(sale => {
-                try {
-                    const saleDate = new Date(sale.date);
-                    return saleDate.getMonth() === currentMonth && 
-                           saleDate.getFullYear() === currentYear;
-                } catch (error) {
-                    return false;
+        const monthlyRevenue = sales.reduce((total, sale) => {
+            try {
+                // Si la venta tiene fecha en formato string "dd/mm/yyyy"
+                let saleDate;
+                
+                if (sale.date && sale.date.includes('/')) {
+                    // Formato: "dd/mm/yyyy"
+                    const [day, month, year] = sale.date.split('/').map(num => parseInt(num));
+                    saleDate = new Date(year, month - 1, day); // month-1 porque enero es 0
+                } else if (sale.date) {
+                    // Intentar parsear como Date
+                    saleDate = new Date(sale.date);
+                } else {
+                    return total;
                 }
-            })
-            .reduce((sum, sale) => sum + (parseFloat(sale.total) || 0), 0);
+                
+                // Verificar si la venta es del mes y año actual
+                if (saleDate.getMonth() === currentMonth && 
+                    saleDate.getFullYear() === currentYear) {
+                    return total + (parseFloat(sale.total) || 0);
+                }
+            } catch (error) {
+                console.warn('Error procesando fecha de venta:', sale.date, error);
+            }
+            return total;
+        }, 0);
         
+        document.getElementById('monthly-revenue').textContent = `S/ ${monthlyRevenue.toFixed(2)}`;
+        
+        // 3. Calcular total de clientes
+        const totalClients = clients.length;
+        document.getElementById('total-clients').textContent = totalClients;
+        
+        // 4. Calcular total de envíos
+        const shippingSales = sales.filter(sale => sale.requiresShipping === true);
+        document.getElementById('total-shipping').textContent = shippingSales.length;
+        
+        // 5. Calcular total de ventas
+        const totalSales = sales.length;
+        document.getElementById('total-sales').textContent = totalSales;
+        
+        // 6. Calcular envíos pendientes
+        const pendingShipping = sales.filter(sale => 
+            sale.requiresShipping === true && 
+            sale.shippingStatus === 'pending'
+        ).length;
+        document.getElementById('pending-shipping').textContent = pendingShipping;
+        
+        // 7. Calcular productos con stock bajo
         const lowStockProducts = products.filter(p => {
             const stock = parseInt(p.stock) || 0;
-            const minStock = parseInt(p.minStock) || 0;
+            const minStock = parseInt(p.minStock) || 5;
             return stock > 0 && stock <= minStock;
         }).length;
+        document.getElementById('low-stock-products').textContent = lowStockProducts;
         
-        const outOfStockProducts = products.filter(p => {
-            const stock = parseInt(p.stock) || 0;
-            return stock === 0;
+        // 8. Calcular ventas del día (CORREGIDO)
+        const today = new Date();
+        const todayStr = `${today.getDate().toString().padStart(2, '0')}/${(today.getMonth() + 1).toString().padStart(2, '0')}/${today.getFullYear()}`;
+        
+        const todaySales = sales.filter(sale => {
+            try {
+                if (sale.date === todayStr) {
+                    return true;
+                }
+                // También verificar si la fecha coincide en otro formato
+                if (sale.date) {
+                    const saleDate = new Date(sale.date);
+                    const saleDateStr = `${saleDate.getDate().toString().padStart(2, '0')}/${(saleDate.getMonth() + 1).toString().padStart(2, '0')}/${saleDate.getFullYear()}`;
+                    return saleDateStr === todayStr;
+                }
+                return false;
+            } catch (error) {
+                return false;
+            }
         }).length;
         
-        document.getElementById('total-products').textContent = '18';
-        document.getElementById('monthly-revenue').textContent = 'S/ 1,250.00';
-        document.getElementById('total-clients').textContent = '5';
-        document.getElementById('total-shipping').textContent = '0';
-        document.getElementById('total-sales').textContent = '18';
-        document.getElementById('pending-shipping').textContent = '0';
-
-        document.getElementById('low-stock-products').textContent = '3';
-        document.getElementById('today-sales').textContent = '2';
-        document.getElementById('average-ticket').textContent = 'S/ 69.44';
-        document.getElementById('conversion-rate').textContent = '65%';
-
-
-         document.getElementById('low-stock-alert').textContent = '3';
+        document.getElementById('today-sales').textContent = todaySales;
         
-        const lowStockAlertEl = document.getElementById('low-stock-alert');
-        if (lowStockAlertEl) {
-            lowStockAlertEl.textContent = lowStockProducts + outOfStockProducts;
+        // 9. Calcular ticket promedio
+        let averageTicket = 0;
+        if (sales.length > 0) {
+            const totalRevenueAllTime = sales.reduce((sum, sale) => sum + (parseFloat(sale.total) || 0), 0);
+            averageTicket = totalRevenueAllTime / sales.length;
+        }
+        document.getElementById('average-ticket').textContent = `S/ ${averageTicket.toFixed(2)}`;
+        
+        // 10. Calcular tasa de conversión
+        const conversionRate = calculateConversionRate(sales, clients);
+        document.getElementById('conversion-rate').textContent = `${conversionRate}%`;
+        
+        // 11. Actualizar alerta de stock bajo
+        const outOfStockProducts = products.filter(p => (parseInt(p.stock) || 0) === 0).length;
+        const totalLowStock = lowStockProducts + outOfStockProducts;
+        document.getElementById('low-stock-alert').textContent = totalLowStock;
+        
+        // 12. Actualizar alertas críticas
+        updateCriticalAlertsWithProducts(products);        
+        
+        // 13. Actualizar ventas recientes (SOLO ESTA FUNCIÓN EXISTE)
+        loadRecentSalesSummary();
+        
+        
+        // 14. Actualizar gráficos (si existen)
+        if (window.dashboardCharts) {
+            updateDashboardCharts(sales, products);
         }
         
-        updatePendingSalesAlert(sales);
+        console.log('✅ Dashboard actualizado correctamente. Ingresos mensuales:', monthlyRevenue);
         
     } catch (error) {
-        console.error('Error actualizando dashboard:', error);
+        console.error('❌ Error actualizando dashboard:', error);
+        showAlert('Error al actualizar dashboard: ' + error.message, 'error');
     }
 }
+
+// Función auxiliar para actualizar alertas críticas (sin parámetros)
+async function updateCriticalAlerts() {
+    try {
+        const products = await getProducts();
+        updateCriticalAlertsWithProducts(products);
+    } catch (error) {
+        console.error('❌ Error cargando productos para alertas:', error);
+    }
+}
+
+// Renombra la función existente (para evitar conflicto)
+async function updateCriticalAlertsWithProducts(products) {
+    const container = document.getElementById('critical-alerts-container');
+    
+    if (!container) return;
+    
+    // Filtrar productos críticos
+    const criticalProducts = products.filter(product => {
+        const stock = parseInt(product.stock) || 0;
+        const minStock = parseInt(product.minStock) || 5;
+        return stock === 0 || stock <= minStock;
+    });
+    
+    if (criticalProducts.length === 0) {
+        container.innerHTML = '';
+        return;
+    }
+    
+    // Crear alertas específicas
+    let alertsHTML = '';
+    
+    // Productos sin stock
+    const outOfStock = criticalProducts.filter(p => (parseInt(p.stock) || 0) === 0);
+    if (outOfStock.length > 0) {
+        alertsHTML += `
+            <div class="alert alert-error mt-2">
+                <i class="fas fa-times-circle"></i>
+                <strong>${outOfStock.length} producto(s) sin stock:</strong>
+                ${outOfStock.map(p => p.name).slice(0, 3).join(', ')}
+                ${outOfStock.length > 3 ? `... y ${outOfStock.length - 3} más` : ''}
+            </div>
+        `;
+    }
+    
+    // Productos con stock bajo
+    const lowStock = criticalProducts.filter(p => {
+        const stock = parseInt(p.stock) || 0;
+        const minStock = parseInt(p.minStock) || 5;
+        return stock > 0 && stock <= minStock;
+    });
+    
+    if (lowStock.length > 0) {
+        alertsHTML += `
+            <div class="alert alert-warning mt-2">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>${lowStock.length} producto(s) con stock bajo:</strong>
+                ${lowStock.slice(0, 3).map(p => `${p.name} (${p.stock} unidades)`).join(', ')}
+                ${lowStock.length > 3 ? `... y ${lowStock.length - 3} más` : ''}
+            </div>
+        `;
+    }
+    
+    container.innerHTML = alertsHTML;
+}
+
+
+// Función para calcular tasa de conversión (ejemplo)
+function calculateConversionRate(sales, clients) {
+    if (clients.length === 0) return 0;
+    
+    // Contar clientes únicos que han comprado
+    const clientsWithPurchases = [...new Set(sales.map(sale => sale.clientId))].length;
+    const conversionRate = (clientsWithPurchases / clients.length) * 100;
+    
+    return Math.min(Math.round(conversionRate * 10) / 10, 100);
+}
+
+
+async function loadRecentSalesSummary() {
+    try {
+        const sales = await getSales();
+        const clients = await getClients();
+        const tbody = document.getElementById('recent-sales-summary-body');
+        
+        if (!tbody) return;
+        
+        // Mostrar las últimas 5 ventas
+        const recentSales = sales.slice(-5).reverse();
+        
+        if (recentSales.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="4" class="empty-state">
+                        <i class="fas fa-receipt"></i>
+                        <p>No hay ventas recientes</p>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+        
+        tbody.innerHTML = recentSales.map(sale => {
+            const client = clients.find(c => c.id === sale.clientId);
+            return `
+                <tr>
+                    <td>#${sale.id.toString().padStart(4, '0')}</td>
+                    <td>${client ? client.name.substring(0, 20) + (client.name.length > 20 ? '...' : '') : 'N/A'}</td>
+                    <td>S/ ${(sale.total || 0).toFixed(2)}</td>
+                    <td>${sale.date || 'N/A'}</td>
+                </tr>
+            `;
+        }).join('');
+        
+    } catch (error) {
+        console.error('Error cargando ventas recientes:', error);
+    }
+}
+
+
+
+// Actualizar alerta de ventas pendientes
+function updatePendingSalesAlert(sales) {
+    const pendingSales = sales.filter(s => s.status === 'Separado');
+    const totalPendingAmount = pendingSales.reduce((sum, sale) => sum + (parseFloat(sale.pendingAmount) || 0), 0);
+    
+    let pendingAlert = document.querySelector('.pending-sales-alert');
+    
+    if (pendingSales.length > 0) {
+        if (!pendingAlert) {
+            // Crear alerta si no existe
+            pendingAlert = document.createElement('div');
+            pendingAlert.className = 'alert alert-warning pending-sales-alert';
+            pendingAlert.style.margin = '20px 0';
+            pendingAlert.style.padding = '15px';
+            pendingAlert.style.borderRadius = '8px';
+            pendingBorder = '1px solid #ffeaa7';
+            pendingAlert.style.backgroundColor = '#fff9e6';
+            
+            const dashboardSection = document.getElementById('dashboard-section');
+            if (dashboardSection) {
+                const statsGrid = dashboardSection.querySelector('.stats-grid');
+                if (statsGrid) {
+                    dashboardSection.insertBefore(pendingAlert, statsGrid);
+                } else {
+                    dashboardSection.appendChild(pendingAlert);
+                }
+            }
+        }
+        
+        pendingAlert.innerHTML = `
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center;">
+                    <i class="fas fa-clock" style="font-size: 1.2em; margin-right: 10px; color: #f39c12;"></i>
+                    <div>
+                        <strong style="color: #e67e22;">Tienes ${pendingSales.length} ventas pendientes</strong>
+                        <div style="font-size: 0.9em; color: #7d6608;">
+                            Total pendiente: S/ ${totalPendingAmount.toFixed(2)}
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-success btn-sm" onclick="showSection('pending-sales')">
+                    <i class="fas fa-eye"></i> Ver Pendientes
+                </button>
+            </div>
+        `;
+    } else if (pendingAlert) {
+        // Eliminar alerta si no hay ventas pendientes
+        pendingAlert.remove();
+    }
+}
+
+// === FUNCIÓN PARA ACTUALIZAR GRÁFICOS DEL DASHBOARD ===
+function updateDashboardCharts(sales, products) {
+    // Verificar si los gráficos existen
+    if (!window.dashboardCharts) {
+        console.log('📊 Inicializando gráficos del dashboard...');
+        window.dashboardCharts = initializeDashboardCharts();
+    }
+    
+    // Datos para ventas mensuales
+    const monthlyData = calculateMonthlySales(sales);
+    if (window.dashboardCharts.monthlySalesChart) {
+        window.dashboardCharts.monthlySalesChart.data.datasets[0].data = monthlyData;
+        window.dashboardCharts.monthlySalesChart.update();
+    }
+    
+    // Datos para productos más vendidos
+    const topProductsData = calculateTopProducts(sales, products);
+    if (window.dashboardCharts.topProductsChart) {
+        window.dashboardCharts.topProductsChart.data.datasets[0].data = topProductsData.data;
+        window.dashboardCharts.topProductsChart.data.labels = topProductsData.labels;
+        window.dashboardCharts.topProductsChart.update();
+    }
+    
+    // Datos para métodos de pago
+    const paymentMethodsData = calculatePaymentMethods(sales);
+    if (window.dashboardCharts.paymentMethodsChart) {
+        window.dashboardCharts.paymentMethodsChart.data.datasets[0].data = paymentMethodsData.data;
+        window.dashboardCharts.paymentMethodsChart.update();
+    }
+}
+
+// Calcular ventas mensuales
+function calculateMonthlySales(sales) {
+    const monthlyData = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    const currentYear = new Date().getFullYear();
+    
+    sales.forEach(sale => {
+        try {
+            const saleDate = new Date(sale.date);
+            if (saleDate.getFullYear() === currentYear) {
+                const month = saleDate.getMonth();
+                monthlyData[month] += parseFloat(sale.total) || 0;
+            }
+        } catch (error) {
+            // Ignorar fechas inválidas
+        }
+    });
+    
+    return monthlyData;
+}
+
+// Calcular productos más vendidos
+function calculateTopProducts(sales, products) {
+    const productSales = {};
+    
+    sales.forEach(sale => {
+        sale.items.forEach(item => {
+            if (!productSales[item.productId]) {
+                productSales[item.productId] = {
+                    name: item.name,
+                    quantity: 0
+                };
+            }
+            productSales[item.productId].quantity += parseInt(item.quantity) || 0;
+        });
+    });
+    
+    const sortedProducts = Object.values(productSales)
+        .sort((a, b) => b.quantity - a.quantity)
+        .slice(0, 5);
+    
+    return {
+        labels: sortedProducts.map(p => p.name),
+        data: sortedProducts.map(p => p.quantity)
+    };
+}
+
+// Calcular métodos de pago
+function calculatePaymentMethods(sales) {
+    const paymentMethods = {
+        efectivo: 0,
+        tarjeta: 0,
+        transferencia: 0,
+        yape: 0
+    };
+    
+    sales.forEach(sale => {
+        const method = sale.paymentMethod || 'efectivo';
+        if (paymentMethods.hasOwnProperty(method)) {
+            paymentMethods[method] += parseFloat(sale.total) || 0;
+        } else {
+            paymentMethods.efectivo += parseFloat(sale.total) || 0;
+        }
+    });
+    
+    return {
+        data: [
+            paymentMethods.efectivo,
+            paymentMethods.tarjeta,
+            paymentMethods.transferencia,
+            paymentMethods.yape
+        ]
+    };
+}
+
+// === MODIFICAR LA FUNCIÓN DE INICIALIZACIÓN ===
+async function loadInitialData() {
+    console.log('📊 Cargando datos iniciales...');
+    
+    try {
+        await loadProductsTable();
+        await loadProductsGrid();
+        await loadClientsTable();
+        await loadSalesHistory();
+        await populateSaleSelects();
+        await loadRecentSales();
+        await updateDashboardStats(); // ESTA ES LA LÍNEA CLAVE
+        await loadCategories();
+        await loadCategoriesTable();
+        
+        console.log('✅ Datos iniciales cargados');
+    } catch (error) {
+        console.error('❌ Error cargando datos iniciales:', error);
+        throw error;
+    }
+}
+
+// === ACTUALIZAR setupRealtimeUpdates ===
+function setupRealtimeUpdates() {
+    console.log('🔄 Configurando actualizaciones en tiempo real...');
+    
+    // Escuchar cambios en productos
+    database.ref('products').on('value', () => {
+        loadProductsTable();
+        loadProductsGrid();
+        populateSaleSelects();
+        updateDashboardStats(); // Actualizar dashboard cuando cambien productos
+    });
+    
+    // Escuchar cambios en clientes
+    database.ref('clients').on('value', () => {
+        loadClientsTable();
+        populateSaleSelects();
+        updateDashboardStats(); // Actualizar dashboard cuando cambien clientes
+    });
+    
+    // Escuchar cambios en ventas
+    database.ref('sales').on('value', () => {
+        loadSalesHistory();
+        loadRecentSales();
+        updateDashboardStats(); // Actualizar dashboard cuando cambien ventas
+        updateAllBadges();
+    });
+}
+
+// === ACTUALIZAR showSection ===
+function showSection(section) {
+    document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+    const target = document.getElementById(section + '-section');
+    if (target) target.classList.remove('hidden');
+    
+    if (section === 'dashboard') {
+        updateDashboardStats(); // ACTUALIZAR CUANDO SE VISUALICE EL DASHBOARD
+        loadPendingSalesDashboard();
+    } else if (section === 'sales') {
+        populateSaleSelects();
+        loadProductsGrid();
+    } else if (section === 'products') {
+        loadProductsTable();
+        loadProductsGrid();
+    } else if (section === 'clients') {
+        loadClientsTable();
+    } else if (section === 'categories') {
+        loadCategoriesTable();
+    } else if (section === 'inventory') {
+        loadInventoryData();
+    } else if (section === 'pending-sales') {
+        loadPendingSalesSection();
+    } else if (section === 'shipping') {
+        loadShippingSection();
+    } else if (section === 'reports') {
+        loadReportsSection();
+    }
+}
+
+
+
+
 
 function updatePendingSalesAlert(sales) {
     const pendingSales = sales.filter(s => s.status === 'Separado');
@@ -2067,6 +2592,7 @@ async function loadSalesHistory() {
                         <i class="fas fa-money-bill-wave"></i> Pagar
                     </button>
                     ` : ''}
+                    
                     <button class="btn btn-danger btn-sm" onclick="deleteSale(${sale.id})">
                         <i class="fas fa-trash"></i>
                     </button>
@@ -2130,6 +2656,7 @@ async function loadPendingSalesSection() {
 async function loadPendingSalesTable() {
     const sales = await getSales();
     const clients = await getClients();
+    const products = await getProducts(); // Obtener todos los productos
     const tbody = document.getElementById('pending-sales-table-body');
     if (!tbody) return;
     
@@ -2160,6 +2687,26 @@ async function loadPendingSalesTable() {
         const statusClass = getPendingStatusClass(sale.status);
         const isOverdue = isSaleOverdue(sale);
         
+        // Generar HTML de productos con imágenes
+        const productsHTML = sale.items.map(item => {
+            const product = products.find(p => p.id === item.productId);
+            const imageHTML = product?.image 
+                ? `<img src="${product.image}" alt="${item.name}" class="product-mini-image" onerror="this.style.display='none'">`
+                : `<div class="product-mini-icon"><i class="fas fa-box"></i></div>`;
+            
+            return `
+                <div class="product-mini-item">
+                    <div class="product-mini-image-container">
+                        ${imageHTML}
+                    </div>
+                    <div class="product-mini-info">
+                        <span class="product-mini-name">${item.name}</span>
+                        <span class="product-mini-quantity">(${item.quantity} und.)</span>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
         const row = document.createElement('tr');
         row.className = isOverdue ? 'overdue-sale' : '';
         row.innerHTML = `
@@ -2176,10 +2723,8 @@ async function loadPendingSalesTable() {
             </td>
             <td>${sale.date}</td>
             <td>
-                <div class="products-preview">
-                    ${sale.items.slice(0, 2).map(item => `
-                        <span class="product-tag">${item.name} (${item.quantity})</span>
-                    `).join('')}
+                <div class="products-preview-with-images">
+                    ${productsHTML}
                     ${sale.items.length > 2 ? `<span class="more-products">+${sale.items.length - 2} más</span>` : ''}
                 </div>
             </td>
@@ -2608,7 +3153,7 @@ async function loadInventoryTable() {
     tbody.innerHTML = '';
     
     if (products.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><i class="fas fa-boxes"></i><p>No hay productos en inventario</p></td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" class="empty-state"><i class="fas fa-boxes"></i><p>No hay productos en inventario</p></td></tr>';
         return;
     }
     
@@ -2617,14 +3162,19 @@ async function loadInventoryTable() {
         const statusText = getStockStatusText(product.stock, product.minStock);
         const stockValue = (product.price * product.stock).toFixed(2);
         
+        // MOSTRAR IMAGEN DEL PRODUCTO EN LA TABLA
+        const imageHTML = product.image 
+            ? `<img src="${product.image}" alt="${product.name}" class="product-table-image-small" onerror="this.style.display='none'">`
+            : `<div class="product-table-icon-small"><i class="fas fa-box"></i></div>`;
+        
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>
                 <div class="product-info-small">
-                    <div class="product-icon-small">
-                        <i class="fas fa-box"></i>
+                    <div class="product-image-cell-small">
+                        ${imageHTML}
                     </div>
-                    <div>
+                    <div class="product-text-info">
                         <strong>${product.name}</strong>
                         <br>
                         <small>ID: ${product.id}</small>
@@ -3237,6 +3787,7 @@ function filterShipping(status) {
     });
 }
 
+
 async function loadShippingTable() {
     const sales = await getSales();
     const clients = await getClients();
@@ -3246,13 +3797,12 @@ async function loadShippingTable() {
     
     tbody.innerHTML = '';
     
-    // Filtrar ventas que requieren envío
     const shippingSales = sales.filter(sale => sale.requiresShipping === true);
     
     if (shippingSales.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="7" class="empty-state">
+                <td colspan="9" class="empty-state">
                     <i class="fas fa-shipping-fast"></i>
                     <p>No hay envíos registrados</p>
                 </td>
@@ -3261,7 +3811,6 @@ async function loadShippingTable() {
         return;
     }
     
-    // Ordenar: pendientes primero
     shippingSales.sort((a, b) => {
         if (a.shippingStatus === 'pending' && b.shippingStatus !== 'pending') return -1;
         if (a.shippingStatus !== 'pending' && b.shippingStatus === 'pending') return 1;
@@ -3271,72 +3820,107 @@ async function loadShippingTable() {
     shippingSales.forEach(sale => {
         const client = clients.find(c => c.id === sale.clientId);
         
-        // Generar código basado en productos si no existe
         if (!sale.shippingCode) {
             sale.shippingCode = generateProductBasedCode(sale.items, products);
         }
         
-        // Determinar estado y clases - CORREGIDO
-        let statusText, statusClass;
+        let statusText, statusClass, badgeIcon, isDisabled = false;
         switch(sale.shippingStatus) {
             case 'sent':
             case 'transit':
                 statusText = 'EN TRÁNSITO';
                 statusClass = 'status-transit';
+                badgeIcon = 'fa-truck';
                 break;
-            case 'delivered': // <- ESTE ES EL ESTADO QUE QUEREMOS
-                statusText = 'ENVIADO';
+            case 'delivered':
+                statusText = 'ENVIADO ✓';
                 statusClass = 'status-delivered';
+                badgeIcon = 'fa-check-circle';
+                isDisabled = true; // ¡IMPORTANTE! Esto marca como deshabilitado
                 break;
             case 'cancelled':
                 statusText = 'CANCELADO';
                 statusClass = 'status-cancelled';
+                badgeIcon = 'fa-times-circle';
+                isDisabled = true;
                 break;
             default:
                 statusText = 'PENDIENTE';
                 statusClass = 'status-pending';
+                badgeIcon = 'fa-clock';
         }
+        
+        // Generar lista de productos con imágenes
+        const productsList = sale.items.map(item => {
+            const product = products.find(p => p.id === item.productId);
+            const imageHTML = product?.image 
+                ? `<img src="${product.image}" alt="${item.name}" class="shipping-product-image" onerror="this.style.display='none'">`
+                : `<div class="shipping-product-icon"><i class="fas fa-box"></i></div>`;
+            
+            return `
+                <div class="shipping-product-item">
+                    <div class="shipping-product-image-container">
+                        ${imageHTML}
+                    </div>
+                    <div class="shipping-product-info">
+                        <span class="shipping-product-name">${item.name}</span>
+                        <span class="shipping-product-quantity">(${item.quantity})</span>
+                    </div>
+                </div>
+            `;
+        }).join('');
         
         const row = document.createElement('tr');
         row.innerHTML = `
+            <td>#${sale.id.toString().padStart(4, '0')}</td>
             <td>
-                <div class="client-info-small">
+                <div class="shipping-client-info">
                     <strong>${client ? client.name : 'N/A'}</strong>
                     <br>
                     <small>${client ? client.phone || 'Sin teléfono' : ''}</small>
                 </div>
             </td>
+            <td>
+                <div class="shipping-products-summary">
+                    <div class="shipping-products-images">
+                        ${productsList}
+                    </div>
+                </div>
+            </td>
             <td>${sale.shippingCity || 'No especificada'}</td>
             <td>${sale.shippingAddress || 'N/A'}</td>
-            <td>${sale.date}</td>
+            <td>${sale.date || 'N/A'}</td>
             <td>
                 <div class="shipping-code">
                     <strong>${sale.shippingCode}</strong>
-                    <button class="btn btn-sm btn-outline copy-btn" onclick="copyShippingCode('${sale.shippingCode}')" title="Copiar código">
-                        <i class="fas fa-copy"></i>
-                    </button>
                 </div>
             </td>
             <td>
-                <span class="status-badge ${statusClass}">${statusText}</span>
+                <span class="status-badge ${statusClass}">
+                    <i class="fas ${badgeIcon}"></i> ${statusText}
+                </span>
+                ${sale.shippingStatus === 'delivered' && sale.sentDate ? `
+                <br>
+                <small class="sent-date">Enviado: ${sale.sentDate} ${sale.sentTime || ''}</small>
+                ` : ''}
             </td>
             <td>
                 <div class="action-buttons">
-                    ${sale.shippingStatus === 'pending' ? `
-                    <button class="btn btn-success btn-sm" onclick="markAsSent(${sale.id})">
-                        <i class="fas fa-check"></i> Marcar como Enviado
-                    </button>
-                    ` : ''}
                     <button class="btn btn-info btn-sm" onclick="showShippingDetails(${sale.id})">
                         <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="btn btn-success btn-sm" 
+                            onclick="markAsSent(${sale.id})" 
+                            ${isDisabled ? 'disabled' : ''}
+                            style="${isDisabled ? 'opacity: 0.6; cursor: not-allowed; background-color: #95a5a6;' : ''}">
+                        <i class="fas fa-check"></i>
+                        ${isDisabled ? 'Enviado' : 'Enviar'}
                     </button>
                 </div>
             </td>
         `;
         tbody.appendChild(row);
     });
-    
-    console.log('📦 Tabla de envíos cargada:', shippingSales.length, 'envíos');
 }
 
 
@@ -3702,22 +4286,22 @@ function generateProductBasedCode(items, products) {
 }
 
 async function markAsSent(saleId) {
-    if (confirm('¿Marcar este pedido como ENVIADO?\n')) {
+    if (confirm('¿Marcar este pedido como ENVIADO?\n\nEl botón se deshabilitará y mostrará el estado de ENVIADO.')) {
         const sales = await getSales();
         const saleIndex = sales.findIndex(s => s.id === saleId);
         
         if (saleIndex === -1) return;
         
-        // Cambiar a 'delivered' en lugar de 'sent'
-        sales[saleIndex].shippingStatus = 'delivered'; // <- CAMBIA ESTO
+        // Cambiar a 'delivered' (enviado)
+        sales[saleIndex].shippingStatus = 'delivered';
         sales[saleIndex].sentDate = new Date().toLocaleDateString('es-PE');
         sales[saleIndex].sentTime = new Date().toLocaleTimeString('es-PE');
         
         await saveSales(sales);
         
-        showAlert('✅ Pedido marcado como ENVIADO', 'success');
+        showAlert('✅ Pedido marcado como ENVIADO. El botón ahora está deshabilitado.', 'success');
         loadShippingSection();
-        updateAllBadges(); // Actualizar badges
+        updateAllBadges();
     }
 }
 
@@ -7277,8 +7861,5 @@ function downloadReceiptAsPDF(saleId) {
         showAlert('❌ Error al generar el PDF', 'error');
     }
 }
-
-
-
 
 console.log('✅ Sistema de ventas cargado correctamente');
